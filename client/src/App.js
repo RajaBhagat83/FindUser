@@ -16,6 +16,7 @@ import { useState } from "react";
 import Messanging from "./modules/Elements/Messanging.js";
 
 const ProtectedRoute = ({ children, auth = false }) => {
+
   const isLoggedin = localStorage.getItem("user:token") !== null || false;
   if (!isLoggedin && auth) {
     return <Navigate to={"/"} />;

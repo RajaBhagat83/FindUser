@@ -5,6 +5,9 @@ const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const http = require("http");
 const socketIo = require("socket.io");
+const path = require("path");
+const multer = require("multer");
+
 JWT_SECRET = "secret";
 
 require("dotenv").config(); //used to load .env variable to process.env
@@ -15,7 +18,7 @@ const Conversation = require("./models/Conversation");
 const Messages = require("./models/Messages");
 
 const app = express();
-const server = http.createServer(app); // create HTTP server that uses Express app
+const server = http.createServer(app);
 
 const io = socketIo(server, {
   cors: {
@@ -26,7 +29,19 @@ const io = socketIo(server, {
 
 app.use(cors()); //accept request from any domain
 app.use(express.json()); //parse request
-app.use(express.urlencoded({ extended: false })); //url-encoded form data ko parse karta hai
+app.use(express.urlencoded({ extended: false }));
+//url-encoded form data ko parse karta hai
+
+app.use("/uploads", express.static("uploads")); //server uploaded images
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    return cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    return cb(null, `${Date.now()}-${file.originalname}`);
+  },
+});
+const upload = multer({ storage });
 
 let users = []; //stores online users [{userId, socketId}]
 
@@ -46,26 +61,30 @@ io.on("connection", (socket) => {
     broadcastOnlineUsers();
   });
 
-  socket.on("sendMessage", async ({ senderId, receiverId, message, conversationId }) => {
-    const receiver = users.find((user) => user.userId === receiverId);
-    const sender = users.find((user) => user.userId === senderId);
-    const user = await User.findById(senderId);
-    if (receiver) {
-      io.to(receiver.socketId).to(sender.socketId).emit("getMessage", {
-        senderId,
-        message,
-        conversationId,
-        receiverId,
-        user: {
-          _id: user._id,
-          fullName: user.fullName,
-          email: user.email,
-          interest: user.interest,
-        },
-      });
+  socket.on(
+    "sendMessage",
+    async ({ senderId, receiverId, message, conversationId }) => {
+      const receiver = users.find((user) => user.userId === receiverId);
+      const sender = users.find((user) => user.userId === senderId);
+      const user = await User.findById(senderId);
+      if (receiver) {
+        io.to(receiver.socketId)
+          .to(sender.socketId)
+          .emit("getMessage", {
+            senderId,
+            message,
+            conversationId,
+            receiverId,
+            user: {
+              _id: user._id,
+              fullName: user.fullName,
+              email: user.email,
+              interest: user.interest,
+            },
+          });
+      }
     }
-  });
-
+  );
 
   socket.on("disconnect", () => {
     console.log("Client disconnected:", socket.id);
@@ -81,13 +100,15 @@ function removeUser(socketId) {
 
 app.get("/", (req, res) => res.send("Welcome"));
 
-// Auth Endpoints 
+// Auth Endpoints
 app.post("/api/register", async (req, res) => {
   try {
     const { fullName, email, password, interest } = req.body;
 
     if (!fullName || !email || !password || !interest) {
-      return res.status(400).json({ message: "Please enter all required details." });
+      return res
+        .status(400)
+        .json({ message: "Please enter all required details." });
     }
 
     const existingUser = await User.findOne({ email });
@@ -102,11 +123,14 @@ app.post("/api/register", async (req, res) => {
       email,
       interest,
       password: hashedPassword,
+
     });
 
     await newUser.save();
 
-    const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, { expiresIn: "1d" });
+    const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, {
+      expiresIn: "1d",
+    });
 
     res.status(201).json({
       message: "User registered successfully",
@@ -115,6 +139,7 @@ app.post("/api/register", async (req, res) => {
         fullName: newUser.fullName,
         email: newUser.email,
         interest: newUser.interest,
+        profilePic: newUser.profilePic,
       },
       token,
     });
@@ -144,7 +169,13 @@ app.post("/api/login", async (req, res) => {
 
   res.status(200).json({
     message: "Login successful",
-    user: { fullName: user.fullName, email: user.email, interest: user.interest, _id: user._id },
+    user: {
+      fullName: user.fullName,
+      email: user.email,
+      interest: user.interest,
+      _id: user._id,
+      profilePic: user.profilePic,
+    },
     token,
   });
 });
@@ -152,9 +183,12 @@ app.post("/api/login", async (req, res) => {
 // ===== Conversation Endpoints =====
 app.post("/api/conversation", async (req, res) => {
   const { senderId, receiverId } = req.body;
-  if (!senderId || !receiverId) return res.status(400).send("Required IDs missing");
+  if (!senderId || !receiverId)
+    return res.status(400).send("Required IDs missing");
 
-  let conversation = await Conversation.findOne({ members: { $all: [senderId, receiverId] } });
+  let conversation = await Conversation.findOne({
+    members: { $all: [senderId, receiverId] },
+  });
   if (!conversation) {
     conversation = new Conversation({ members: [senderId, receiverId] });
     await conversation.save();
@@ -165,15 +199,16 @@ app.post("/api/conversation", async (req, res) => {
 
 app.get("/api/conversation/:userId", async (req, res) => {
   const { userId } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(userId)) return res.status(400).send("Invalid userId");
+  if (!mongoose.Types.ObjectId.isValid(userId))
+    return res.status(400).send("Invalid userId");
 
   const conversations = await Conversation.find({ members: userId });
   const result = await Promise.all(
     conversations.map(async (conv) => {
       const otherId = conv.members.find((id) => id.toString() !== userId);
       const user = await User.findById(otherId);
-      if (!user) return null;  // <-- added null check here
-      
+      if (!user) return null; // <-- added null check here
+
       const isOnline = users.some((u) => u.userId === otherId.toString());
 
       return {
@@ -183,21 +218,23 @@ app.get("/api/conversation/:userId", async (req, res) => {
           email: user.email,
           interest: user.interest,
           isOnline,
+          profilePic:user.profilePic
         },
         conversationId: conv._id,
       };
     })
   );
 
-  const filteredResult = result.filter(r => r !== null);
+  const filteredResult = result.filter((r) => r !== null);
 
   res.status(200).json(filteredResult);
 });
 
-//  Messages Endpoints 
+//  Messages Endpoints
 app.post("/api/messages", async (req, res) => {
   let { ConversationId, senderId, message, receiverId } = req.body;
-  if (!senderId || !message) return res.status(400).send("Required fields missing");
+  if (!senderId || !message)
+    return res.status(400).send("Required fields missing");
 
   if (ConversationId === "new" && receiverId) {
     let conversation = await Conversation.findOne({
@@ -217,7 +254,12 @@ app.post("/api/messages", async (req, res) => {
   });
   await newMessage.save();
 
-  res.status(201).send("Message sent successfully");
+  res.status(201).json({
+    success: true,
+    message: "Message sent successfully",
+    ConversationId,
+    data: newMessage,
+  });
 });
 
 app.get("/api/messages/:ConversationId", async (req, res) => {
@@ -242,9 +284,10 @@ app.get("/api/messages/:ConversationId", async (req, res) => {
           email: sender.email,
           fullName: sender.fullName,
           interest: sender.interest,
+          profilePic:sender.profilePic
         },
         message: msg.message,
-       createdAt: msg.createdAt,
+        createdAt: msg.createdAt,
       };
     })
   );
@@ -266,6 +309,7 @@ app.get("/api/users/:userId", async (req, res) => {
         receiverId: user._id,
         interest: user.interest,
         isOnline,
+        profilePic:user.profilePic
       },
     };
   });
@@ -285,6 +329,7 @@ app.get("/api/users", async (req, res) => {
           receiverId: user._id,
           interest: user.interest || "",
           isOnline,
+          profilePic:user.profilePic
         },
       };
     });
@@ -296,6 +341,27 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
+app.post("/api/upload-profile", upload.single("profilePic"), async (req, res) => {
+    try {
+      const { userId } = req.body;
+      if (!userId || !req.file)  return res.status(400).json({ message: "Missing userId or file" });
+  
+      const filePath = `/uploads/${req.file.filename}`;
+      const user = await User.findByIdAndUpdate(
+        userId,
+        {profilePic : filePath},
+        {new :true}
+      )
+      res.status(200).json({
+        message: "Profile picture updated successfully",
+        profilePic: user.profilePic,
+      });
+    } catch (err) {
+      console.error("Error uploading profile picture:", err);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  }
+);
 // ===== Start Server =====
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {

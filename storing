@@ -1,0 +1,12 @@
+users proflie : <div className="w-full bg-white p-4 rounded-lg shadow-lg">
+              <img
+                src={Avatar}
+                className="w-12 h-12 rounded-full mx-auto"
+                alt="avatar"
+              />
+              <div className="text-center mt-2">
+                <div className="text-lg font-semibold">{user.fullName}</div>
+                <div className="text-sm">{user.email}</div>
+              </div>
+            </div>
+            
