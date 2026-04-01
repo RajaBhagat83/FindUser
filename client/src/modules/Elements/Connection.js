@@ -28,7 +28,6 @@ function Connection({ className }) {
         `http://localhost:8000/api/conversation/${user._id}`
       );
       const data = await res.json();
-      console.log(data);
       const search = searchUser.trim().toLowerCase();
       if (!search) return setConversation(data);
       setConversation(
@@ -45,7 +44,7 @@ function Connection({ className }) {
 
   return (
     <div
-      className={`w-[28%] h-full p-4 overflow-y-auto bg-gray-50 border-r-1 mt-2 ${className} `}
+      className={`w-max-[28%] w-fit h-full p-4 overflow-y-auto bg-gray-50 border-r-1 mt-2 ${className} `}
     >
       <div className="flex flex-col gap-2">
         <SearchIcon
@@ -63,11 +62,11 @@ function Connection({ className }) {
           >
             <div className="flex items-center gap-6">
               <img src={otherUser?.profilePic ?`http://localhost:8000${otherUser.profilePic}?t=${Date.now()}` : goku} className="w-15 h-16 rounded-full" alt="avatar" />
-              <div>
+              <div className="">
                 <div className="font-semibold w-44">{otherUser.fullName}</div>
-                <div className="text-sm w-44">{otherUser.interest}</div>
+                <div className="text-sm max-w-28 w-fit h-max-4 h-fit">{otherUser.interest}</div>
               </div>
-              <div className="relative ">
+              <div className="relative -left-14 ">
                 <MdOutlineMessage
                   color="black"
                   className="hover:bg-blue-400"
@@ -78,7 +77,7 @@ function Connection({ className }) {
               </div>
               <div>
                 <UserIcon
-                  className="w-5 h-5  relative "
+                  className="w-5 h-5  relative -left-16"
                   onClick={() => {
                     setProfile(!profile);
                   }}

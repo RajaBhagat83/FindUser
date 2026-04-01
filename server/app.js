@@ -64,10 +64,15 @@ io.on("connection", (socket) => {
   socket.on(
     "sendMessage",
     async ({ senderId, receiverId, message, conversationId }) => {
+      console.log("users in the send messages emit section", users);
+      console.log("reciverId in the send message", receiverId);
+      console.log("senderId in the send message", senderId);
       const receiver = users.find((user) => user.userId === receiverId);
       const sender = users.find((user) => user.userId === senderId);
+      console.log("sender", sender);
+      console.log("receiver", receiver);
       const user = await User.findById(senderId);
-      if (receiver) {
+      if (receiver && sender) {
         io.to(receiver.socketId)
           .to(sender.socketId)
           .emit("getMessage", {
@@ -83,7 +88,7 @@ io.on("connection", (socket) => {
             },
           });
       }
-    }
+    },
   );
 
   socket.on("disconnect", () => {
@@ -123,7 +128,6 @@ app.post("/api/register", async (req, res) => {
       email,
       interest,
       password: hashedPassword,
-
     });
 
     await newUser.save();
@@ -162,7 +166,7 @@ app.post("/api/login", async (req, res) => {
   const token = jwt.sign(
     { userId: user._id, email: user.email },
     process.env.JWT_SECRET || "Secret",
-    { expiresIn: "24h" }
+    { expiresIn: "24h" },
   );
 
   await User.updateOne({ _id: user._id }, { $set: { token } });
@@ -203,27 +207,29 @@ app.get("/api/conversation/:userId", async (req, res) => {
     return res.status(400).send("Invalid userId");
 
   const conversations = await Conversation.find({ members: userId });
-  const result = await Promise.all(
-    conversations.map(async (conv) => {
-      const otherId = conv.members.find((id) => id.toString() !== userId);
-      const user = await User.findById(otherId);
-      if (!user) return null; // <-- added null check here
+  const result = [];
 
-      const isOnline = users.some((u) => u.userId === otherId.toString());
+  for (const conv of conversations) {
+    const otherId = conv.members.find((id) => id.toString() !== userId);
 
-      return {
-        user: {
-          receiverId: user._id,
-          fullName: user.fullName,
-          email: user.email,
-          interest: user.interest,
-          isOnline,
-          profilePic:user.profilePic
-        },
-        conversationId: conv._id,
-      };
-    })
-  );
+    const user = await User.findById(otherId);
+
+    if (!user) continue;
+
+    const isOnline = users.some((u) => u.userId === otherId.toString());
+
+    result.push({
+      user: {
+        receiverId: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        interest: user.interest,
+        isOnline,
+        profilePic: user.profilePic,
+      },
+      conversationId: conv._id,
+    });
+  }
 
   const filteredResult = result.filter((r) => r !== null);
 
@@ -264,9 +270,10 @@ app.post("/api/messages", async (req, res) => {
 
 app.get("/api/messages/:ConversationId", async (req, res) => {
   let { ConversationId } = req.params;
-  const { senderId, receiverId } = req.query;
 
-  if (ConversationId === "new") {
+  
+   if (ConversationId === "new") {
+    const {senderId , receiverId} = req.query;
     const conv = await Conversation.findOne({
       members: { $all: [senderId, receiverId] },
     });
@@ -274,23 +281,26 @@ app.get("/api/messages/:ConversationId", async (req, res) => {
     ConversationId = conv._id;
   }
 
-  const messages = await Messages.find({ ConversationId });
-  const result = await Promise.all(
-    messages.map(async (msg) => {
-      const sender = await User.findById(msg.senderId);
-      return {
-        user: {
-          _id: sender._id,
-          email: sender.email,
-          fullName: sender.fullName,
-          interest: sender.interest,
-          profilePic:sender.profilePic
-        },
-        message: msg.message,
-        createdAt: msg.createdAt,
-      };
-    })
-  );
+  const messages = await Messages.find({ ConversationId: ConversationId });
+  const result = [];
+
+  for (const msg of messages) {
+    const sender = await User.findById(msg.senderId);
+
+    if (!sender) continue;
+
+    result.push({
+      user: {
+        _id: sender._id,
+        email: sender.email,
+        fullName: sender.fullName,
+        interest: sender.interest,
+        profilePic: sender.profilePic,
+      },
+      message: msg.message,
+      createdAt: msg.createdAt,
+    });
+  }
 
   res.status(200).json(result);
 });
@@ -309,7 +319,7 @@ app.get("/api/users/:userId", async (req, res) => {
         receiverId: user._id,
         interest: user.interest,
         isOnline,
-        profilePic:user.profilePic
+        profilePic: user.profilePic,
       },
     };
   });
@@ -329,7 +339,7 @@ app.get("/api/users", async (req, res) => {
           receiverId: user._id,
           interest: user.interest || "",
           isOnline,
-          profilePic:user.profilePic
+          profilePic: user.profilePic,
         },
       };
     });
@@ -341,17 +351,19 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
-app.post("/api/upload-profile", upload.single("profilePic"), async (req, res) => {
+app.post("/api/upload-profile",upload.single("profilePic"),
+  async (req, res) => {
     try {
       const { userId } = req.body;
-      if (!userId || !req.file)  return res.status(400).json({ message: "Missing userId or file" });
-  
+      if (!userId || !req.file)
+        return res.status(400).json({ message: "Missing userId or file" });
+
       const filePath = `/uploads/${req.file.filename}`;
       const user = await User.findByIdAndUpdate(
         userId,
-        {profilePic : filePath},
-        {new :true}
-      )
+        { profilePic: filePath },
+        { new: true },
+      );
       res.status(200).json({
         message: "Profile picture updated successfully",
         profilePic: user.profilePic,
@@ -360,7 +372,7 @@ app.post("/api/upload-profile", upload.single("profilePic"), async (req, res) =>
       console.error("Error uploading profile picture:", err);
       res.status(500).json({ message: "Internal server error" });
     }
-  }
+  },
 );
 // ===== Start Server =====
 const PORT = process.env.PORT || 8000;

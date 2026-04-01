@@ -1,12 +1,11 @@
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
-import { addpages, messaging, selectedUsers, us } from "../store/atoms/atom";
+import {  messaging, selectedUsers, us } from "../store/atoms/atom";
 import React from "react";
 
 export const useFetchMessage = () => {
   const user = useRecoilValue(us);
   const setMessages = useSetRecoilState(messaging);
   const setSelectedUser = useSetRecoilState(selectedUsers);
-  const setAddpage = useSetRecoilState(addpages);
 
 
   const fetchMessage = React.useCallback(async (conversationId, receiver, openProfile = true ) => {
@@ -28,12 +27,11 @@ export const useFetchMessage = () => {
       });
       if (openProfile) {
         setSelectedUser({...receiver,conversationId});
-        setAddpage(false);
       }
     } catch (error) {
       console.error(error);
     }
-  },[user, setMessages, setSelectedUser, setAddpage]);
+  },[user, setMessages, setSelectedUser]);
 
   return fetchMessage;
 };

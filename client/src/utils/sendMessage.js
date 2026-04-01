@@ -8,12 +8,11 @@ export const sendMessage = async ({
 }) => {
   if (!receiver || !message.trim()) return;
 
-  // Send via socket
-  socket?.emit("sendMessage", {
-    ConversationId: conversationId,
+  socket.emit("sendMessage", {
     senderId: userId,
-    message,
     receiverId: receiver.receiverId,
+    ConversationId: conversationId,
+    message
   });
 
   // Send to backend

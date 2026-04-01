@@ -1,14 +1,15 @@
 import {atom} from "recoil"
+import { io } from "socket.io-client";
 
 export const us = atom({
   key:"user",
   default: JSON.parse(localStorage.getItem("user:details")) || {}
 })
 
-export const addpages = atom({
-  key:"addPage",
-  default:false
-});
+// export const addpages = atom({
+//   key:"addPage",
+//   default:false
+// });
 
 export const selectedUsers = atom({
   key:"selectedUser",
@@ -40,6 +41,7 @@ export const people = atom({
   default:[]
 });
 
+ 
 export const sockets = atom({
   key:"socket",
   default:null

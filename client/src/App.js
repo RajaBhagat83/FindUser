@@ -12,18 +12,16 @@ import {
   Routes,
   useNavigate,
 } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Messanging from "./modules/Elements/Messanging.js";
+import { io } from "socket.io-client";
 
 const ProtectedRoute = ({ children, auth = false }) => {
 
   const isLoggedin = localStorage.getItem("user:token") !== null || false;
   if (!isLoggedin && auth) {
     return <Navigate to={"/"} />;
-  } else if (
-    isLoggedin &&
-    ["/users/sign_in", "/users/sign_up"].includes(window.location.pathname)
-  ) {
+  } else if ( isLoggedin && ["/users/sign_in", "/users/sign_up"].includes(window.location.pathname)  ) {
     return <Navigate to={"/DashBoard"} />;
   }
   return children;
@@ -32,6 +30,7 @@ const ProtectedRoute = ({ children, auth = false }) => {
 function App() {
   const [token, setToken] = useState(localStorage.getItem("user:token"));
   const [user, setUser] = useState(localStorage.getItem("user:details"));
+  const [socket,setSocket] =useState(null);
 
   const handleLogout = () => {
     setToken(null);
@@ -40,6 +39,13 @@ function App() {
     localStorage.removeItem("user:token");
   };
 
+    useEffect(() => {
+      const newSocket =  io("http://localhost:8000");
+      setSocket(newSocket);
+      return () => newSocket.disconnect();
+    }, []);
+    console.log("socket in dashboard",socket);
+
   return (
     <Routes>
       <Route
@@ -47,7 +53,7 @@ function App() {
         element={
           <ProtectedRoute auth={true}>
             {token ? (
-              <Dashboard handleLogout={handleLogout} />
+              <Dashboard handleLogout={handleLogout}  />
             ) : (
               <Navigate to="/" />
             )}
@@ -77,7 +83,7 @@ function App() {
       ></Route>
       <Route path="/users/sign_up" element={<Form isSignin={false} setToken={setToken} setUser={setUser} />}></Route>
       <Route path="/whatnew" element={<Whatnew />} />
-      <Route path="/Messages" element={<Messanging />} />
+      <Route path="/Messages" element={<Messanging socket={socket} />} />
     </Routes>
   );
 }
