@@ -25,18 +25,18 @@ function Connection({ className }) {
     if (!user?._id) return;
     (async () => {
       const res = await fetch(
-        `http://localhost:8000/api/conversation/${user._id}`
+        `http://localhost:8000/api/conversation/${user._id}`,
       );
       const data = await res.json();
       const search = searchUser.trim().toLowerCase();
       if (!search) return setConversation(data);
       setConversation(
         data.filter((item) =>
-          item.user?.fullName?.toLowerCase().includes(search)
-        )
+          item.user?.fullName?.toLowerCase().includes(search),
+        ),
       );
     })();
-  }, [user, searchUser]);
+  }, [user, searchUser,conversation]);
 
   const FetchMessages = (conversationId, receiver, openProfile = true) => {
     fetchMessage(conversationId, receiver, true);
@@ -44,40 +44,55 @@ function Connection({ className }) {
 
   return (
     <div
-      className={`w-max-[28%] w-fit h-full p-4 overflow-y-auto bg-gray-50 border-r-1 mt-2 ${className} `}
+      className={`w-[28%] w-max-[28%] h-full p-4 overflow-y-auto bg-white border-r border-slate-200 mt-2 ${className}`}
     >
       <div className="flex flex-col gap-2">
         <SearchIcon
           className="mb-4"
           onChange={(e) => setSearchUsers(e.target.value)}
         />
-        <div className="text-xl font-bold text-gray-400 ml-7 mb-7">
+        <div className="text-xs font-semibold tracking-widest text-slate-400 uppercase ml-7 mb-7">
           CONNECTION
         </div>
         {conversation.map(({ conversationId, user: otherUser }) => (
           <div
             key={conversationId}
-            className="w-full p-4 rounded-lg hover:bg-gray-100 cursor-pointer"
+            className="w-full p-4 rounded-xl hover:bg-violet-50 hover:border-violet-100 border border-transparent cursor-pointer transition-all group"
             onClick={() => FetchMessages(conversationId, otherUser, true)}
           >
             <div className="flex items-center gap-6">
-              <img src={otherUser?.profilePic ?`http://localhost:8000${otherUser.profilePic}?t=${Date.now()}` : goku} className="w-15 h-16 rounded-full" alt="avatar" />
+              <img
+                src={otherUser?.profilePic ? `${otherUser.profilePic}` : goku}
+                className="w-12 h-12 border border-slate-200 bg-slate-100 rounded-xl object-cover flex-shrink-0"
+                alt="avatar"
+              />
               <div className="">
-                <div className="font-semibold w-44">{otherUser.fullName}</div>
-                <div className="text-sm max-w-28 w-fit h-max-4 h-fit">{otherUser.interest}</div>
+                <div className="font-semibold text-sm text-slate-800 w-44">
+                  {otherUser.fullName}
+                </div>
+                <div className="text-xs text-violet-400 max-w-28 w-fit h-max-4 h-fit mt-0.5">
+                  {otherUser.interest}
+                </div>
               </div>
-              <div className="relative -left-14 ">
+              <span className="relative right-14">
+                {otherUser.isOnline ? (
+                  <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
+                ) : (
+                  <div className="w-2 h-2 bg-slate-300 rounded-full"></div>
+                )}
+              </span>
+              <div className="relative -left-16 opacity-0 group-hover:opacity-100 transition-opacity">
                 <MdOutlineMessage
-                  color="black"
-                  className="hover:bg-blue-400"
+                  color="#7C3AED"
+                  className="hover:bg-violet-100 rounded p-0.5"
                   onClick={() => {
                     navigate("/Messages");
                   }}
                 />
               </div>
-              <div>
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                 <UserIcon
-                  className="w-5 h-5  relative -left-16"
+                  className="w-5 h-5 relative -left-20 text-slate-400 hover:text-violet-600"
                   onClick={() => {
                     setProfile(!profile);
                   }}

@@ -23,19 +23,18 @@ function Messanging({ socket }) {
   const [user, setUser] = useRecoilState(us);
   const [selectedUser, setSelectedUser] = useRecoilState(selectedUsers);
   const fetchMessage = useFetchMessage();
-  const navigate = useNavigate();
-  const [online,setOnline] = useState("");
+  const [online, setOnline] = useState("");
   const messageRef = useRef();
+  console.log("socket in messaging",socket);
+  useEffect(() => {
+    messageRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.messages]);
 
-  useEffect(() =>{
-    messageRef.current?.scrollIntoView({behavior : "smooth"});
-  },[messages.messages])
+  useEffect(() => {
+    setOnline(messages.receiver?.isOnline);
+  }, [messages]);
 
 
-  useEffect(()=>{
-      setOnline(messages.receiver?.isOnline);
-  },[messages])
- 
   useEffect(() => {
     if (!socket || !user?._id) return;
 
@@ -45,7 +44,7 @@ function Messanging({ socket }) {
         return {
           ...prev,
           conversationId: data.conversationId,
-          receiverId : data.receiverId,
+          receiverId: data.receiverId,
           messages: [
             ...prev.messages,
             {
@@ -71,12 +70,13 @@ function Messanging({ socket }) {
       message,
       receiver: messages.receiver,
       conversationId: messages.conversationId,
-      fetchMessage : fetchMessage
+      fetchMessage: fetchMessage,
     });
     setMessage("");
   };
 
   useEffect(() => {
+    if (selectedUser) return;
     const savedUser = localStorage.getItem("selectedUser");
     if (savedUser) {
       const obj = JSON.parse(savedUser);
@@ -89,57 +89,53 @@ function Messanging({ socket }) {
     if (selectedUser) {
       localStorage.setItem("selectedUser", JSON.stringify(selectedUser));
     }
-  }, [selectedUser]);
-  console.log("message is online",messages.receiver?.isOnline);
-  
+  }, [selectedUser,user]);
+
   return (
-    <div className="w-[70%] h-screen flex flex-col items-center border-x-4 mt-6 p-4 py-4 pb-12 ">
-      <div className="absolute top-1 left-7 mb-12 ">
-        <button
-          type="button"
-          className="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1 me-1 mb-1 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700"
-          onClick={() => {
-            setSelectedUser(null);
-            localStorage.removeItem("selectedUser");
-            navigate("/DashBoard");
-          }}
-        >
-          Go Back{" "}
-        </button>
-      </div>
-      { messages.receiver ? (
+    <div className="w-[70%] h-screen flex flex-col border-x border-slate-200 bg-slate-50">
+      {messages.receiver ? (
         <>
-          <div className="flex justify-between w-full p-2 bg-blue-100 rounded-lg overscroll-contain... overflow-y-auto">
-            <div className="flex items-center gap-6">
-              <img
-                src={Avatar}
-                className="w-10 h-10 rounded-full"
-                alt="avatar"
-              />
-              <div className="">
-                <div className="font-semibold">
+          {/* ── Receiver header bar */}
+          <div className="flex justify-between items-center w-full px-5 py-3 bg-white border-b border-slate-200 flex-shrink-0">
+            <div className="flex items-center gap-3">
+              <div className="relative">
+                <img
+                  src={selectedUser?.profilePic ? `${selectedUser.profilePic}` : Avatar }
+                  className="w-9 h-9 rounded-full object-cover ring-2 ring-violet-100"
+                  alt="avatar"
+                />
+                <span className={`absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white ${online === true ? "bg-emerald-400" : "bg-slate-300"}`} />
+              </div>
+              <div>
+                <div className="font-semibold text-sm text-slate-800">
                   {messages.receiver.fullName}
                 </div>
-                <div className="text-sm">{messages.receiver.email}</div>
+                <div className="text-xs text-slate-400">{messages.receiver.email}</div>
               </div>
-              <div className="text-sm pt-6">{ online == true ? "online": "offline"}</div>
-         
             </div>
-            <img src={Phone} className="w-6 h-6" alt="phone" />
+            <img src={Phone} className="w-4 h-4 opacity-40 hover:opacity-80 transition-opacity cursor-pointer" alt="phone" />
           </div>
-          <div className="flex-1 w-full overflow-y-auto my-4 p-4 bg-gray-50 rounded-lg scroll-mt-6">
+
+          {/* ── Messages area */}
+          <div className="flex-1 w-full overflow-y-auto px-6 py-5 flex flex-col gap-1">
             {messages.messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={` min-w-54 max-w-[60%] w-fit py-2 px-4 mb-2 rounded-lg break-words ${
-                  msg.user._id === user._id
-                    ? "bg-blue-500 text-white ml-auto"
-                    : "bg-gray-200 text-black"
+                className={`flex flex-col max-w-[55%] w-fit mb-1 ${
+                  msg.user._id === user._id ? "ml-auto items-end" : "items-start"
                 }`}
               >
-                <div>{msg.message}</div>
+                <div
+                  className={`py-2.5 px-4 text-sm leading-relaxed break-words ${
+                    msg.user._id === user._id
+                      ? "bg-violet-500 text-white rounded-2xl rounded-br-md"
+                      : "bg-white border border-slate-200 text-slate-700 rounded-2xl rounded-bl-md"
+                  }`}
+                >
+                  {msg.message}
+                </div>
                 {msg.createdAt && (
-                  <div className="text-[10px] text-black font-semibold text-right mt-1">
+                  <div className="text-[10px] text-slate-400 mt-1 px-1">
                     {new Date(msg.createdAt).toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -148,18 +144,20 @@ function Messanging({ socket }) {
                 )}
               </div>
             ))}
-          <div  ref={messageRef} />
+            <div ref={messageRef} />
           </div>
-          <div className="w-full flex items-center gap-4 h-10 pt-12">
+
+          {/* ── Input row */}
+          <div className="w-full flex items-center gap-3 px-5 py-4 bg-white border-t border-slate-200 flex-shrink-0">
             <Input
-              placeholder="Type a message"
+              placeholder="Type a message..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="flex-grow p-2 border border-gray-300 rounded"
+              className="flex-grow border border-slate-200 rounded-xl bg-slate-50 focus:ring-violet-300"
             />
             <img
               src={Payment}
-              className="w-5 h-5 cursor-pointer"
+              className="w-5 h-5 cursor-pointer opacity-40 hover:opacity-80 transition-opacity flex-shrink-0"
               alt="payment"
               onClick={() =>
                 window.open(
@@ -171,17 +169,22 @@ function Messanging({ socket }) {
             <button
               onClick={handleMessage}
               disabled={!message.trim()}
-              className="p-2 rounded-full bg-blue-500 hover:bg-blue-600 disabled:opacity-50"
+              className="p-2.5 rounded-xl bg-violet-500 hover:bg-violet-600 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
             >
-              <img src={messageIcon} className="w-6 h-6" alt="send" />
+              <img src={messageIcon} className="w-4 h-4" alt="send" />
             </button>
           </div>
         </>
       ) : (
-        <div className="mt-20 text-center text-xl text-gray-500">
-          No conversation selected
+        <div className="flex-1 flex flex-col items-center justify-center gap-2">
+          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center">
+            <div className="w-6 h-6 rounded-full bg-slate-300" />
+          </div>
+          <p className="text-sm text-slate-400">No conversation selected</p>
+          <p className="text-xs text-slate-300">Pick someone from your connections to start chatting</p>
         </div>
       )}
+
       <Connection className="absolute top-0 right-[20px] py-7" />
     </div>
   );

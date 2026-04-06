@@ -44,7 +44,6 @@ function App() {
       setSocket(newSocket);
       return () => newSocket.disconnect();
     }, []);
-    console.log("socket in dashboard",socket);
 
   return (
     <Routes>

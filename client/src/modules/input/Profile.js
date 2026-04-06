@@ -1,6 +1,6 @@
 import { useRecoilState, useRecoilValue } from "recoil";
 import { messag, selectedUsers, us } from "../../store/atoms/atom";
-import { MailIcon, UserIcon ,PlusCircleIcon} from "@heroicons/react/outline";
+import { MailIcon, UserIcon, PlusCircleIcon } from "@heroicons/react/outline";
 import { useEffect, useRef, useState } from "react";
 
 function profile({
@@ -9,18 +9,19 @@ function profile({
   ViewingOwnProfile,
   setViewingOwnProfile,
 }) {
-  const [user,setUser] = useRecoilState(us);
+  const [user, setUser] = useRecoilState(us);
   const selectedUser = useRecoilValue(selectedUsers);
   const displayUser = ViewingOwnProfile ? user : selectedUser || user;
-  const [preview, setPreview] = useState(displayUser?.profilePic?`http://localhost:8000${displayUser.profilePic}` : "");
+  const [preview, setPreview] = useState(displayUser?.profilePic ? `$${BACKEND_URL}/uploads/${displayUser.profilePic}` : "");
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef();
+  console.log("preview", preview);
 
   useEffect(() => {
-    if(displayUser?.profilePic){
-      setPreview(`http://localhost:8000${displayUser.profilePic}?t=${Date.now()}`)
+    if (displayUser?.profilePic) {
+      setPreview(`${displayUser.profilePic}`);
     }
-  },[[displayUser?.profilePic]]);
+  }, [displayUser?.profilePic]);
 
   const handleClick = async (e) => {
     const file = e.target.files[0];
@@ -34,19 +35,19 @@ function profile({
     formData.append("userId", displayUser._id);
     try {
       setLoading(true);
-      const res = await fetch("http://localhost:8000/api/upload-profile", {
+      const res = await fetch(`${BACKEND_URL}/api/upload-profile`, {
         method: "POST",
         body: formData,
       });
       const data = await res.json();
+      console.log("image_ur :", data.profilePic);
       if (res.ok) {
-        setPreview(`http://localhost:8000${data.profilePic}?t=${Date.now()}`);
-        setUser(prev => {
-          const update = {...prev, profilePic:data.profilePic }
-
-          localStorage.setItem("user:details",JSON.stringify(update));
+        setPreview(data.profilePic);
+        setUser((prev) => {
+          const update = { ...prev, profilePic: data.profilePic };
+          localStorage.setItem("user:details", JSON.stringify(update));
           return update;
-        })
+        });
         alert("Profile picture updated Successfully");
       } else {
         alert(data.message || "Error uploading profile");
@@ -60,58 +61,83 @@ function profile({
   };
 
   return (
-    <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-3xl shadow-2xl max-w-md mx-auto mt-32 p-6 fixed inset-0 overflow-hidden z-50 h-96 ">
-      <div className="absolute -right-16 -top-16 w-56 h-56 bg-blue-300 opacity-20 rounded-full mix-blend-multiply"></div>
+    <div className="bg-white border border-gray-200 rounded-2xl max-w-md mx-auto mt-32 p-6 fixed inset-0 overflow-hidden z-50 h-96 shadow-sm">
+
+      {/* ── Avatar row */}
       <div className="flex flex-col items-center z-10 relative">
-        <div className="bg-white bg-opacity-60 backdrop-blur-md rounded-full w-24 h-24 flex items-center justify-center shadow-lg mb-3 animate-pulse">
-          {preview ? (
-            <img
-              src={preview}
-              alt="Profile"
-              className="w-full h-full object-cover rounded-full"
-            />
-          ) : (
-            <UserIcon className="w-12 h-12 text-blue-600" />
+        <div className="relative w-20 h-20 mb-4">
+          <div className="w-20 h-20 rounded-full bg-indigo-50 border-2 border-indigo-100 flex items-center justify-center overflow-hidden">
+            {preview ? (
+              <img
+                src={preview}
+                alt="Profile"
+                className="w-full h-full object-cover rounded-full"
+              />
+            ) : (
+              <UserIcon className="w-10 h-10 text-indigo-400" />
+            )}
+          </div>
+          {ViewingOwnProfile && (
+            <>
+              <button
+                onClick={() => fileInputRef.current.click()}
+                className="absolute bottom-0 right-0 bg-indigo-500 text-white rounded-full p-1 hover:bg-indigo-600 transition-colors shadow-sm"
+                title="Upload new profile picture"
+              >
+                <PlusCircleIcon className="w-5 h-5" />
+              </button>
+              <input
+                type="file"
+                name="profilePic"
+                ref={fileInputRef}
+                onChange={handleClick}
+                accept="image/*"
+                className="hidden"
+              />
+            </>
           )}
         </div>
-        {ViewingOwnProfile && (
-          <>
-            <button
-              onClick={() => fileInputRef.current.click()}
-              className="absolute bottom-2 right-2 bg-blue-600 text-white rounded-full p-1 hover:bg-blue-700 transition"
-              title="Upload new profile picture"
-            >
-              <PlusCircleIcon className="w-6 h-6" />
-            </button>
-            <input type="file" ref={fileInputRef} onChange={handleClick} accept="image/*" className="hidden" />
-           </>
-        )}
 
-        <h2 className="text-2xl font-bold text-gray-800 mb-1 tracking-tight">
+        {/* ── Name */}
+        <h2 className="text-lg font-semibold text-gray-900 mb-1 tracking-tight">
           {displayUser.fullName}
         </h2>
-        <div className="flex items-center text-gray-500 text-sm mb-4">
-          <MailIcon className="w-4 h-4 mr-1" /> {displayUser.email}
+
+        {/* ── Email */}
+        <div className="flex items-center text-gray-400 text-xs mb-4 gap-1">
+          <MailIcon className="w-3.5 h-3.5" /> {displayUser.email}
         </div>
-        <div className="w-full mt-2">
-          <h3 className="text-md font-semibold text-blue-700 mb-2 uppercase tracking-wider">
+
+        {/* ── Interests */}
+        <div className="w-full mt-1">
+          <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2">
             Interests
           </h3>
-          <div className="flex flex-wrap gap-2">{displayUser.interest}</div>
+          <div className="flex flex-wrap gap-2">
+            <span className="px-3 py-1 bg-indigo-50 text-indigo-600 text-xs font-medium rounded-full border border-indigo-100">
+              {displayUser.interest}
+            </span>
+          </div>
         </div>
       </div>
+
+      {/* ── Close */}
       <div
-        className="flex h-4 justify-end mt-16 mr-4 cursor-pointer"
+        className="flex justify-end mt-16 mr-1 cursor-pointer"
         onClick={() => {
           setProfile(!profile);
           setViewingOwnProfile(false);
         }}
       >
-        <h2 className="text-red-400">close</h2>
+        <span className="text-xs text-gray-400 hover:text-red-400 transition-colors">
+          close
+        </span>
       </div>
-       {loading && (
-        <div className="absolute inset-0 bg-white bg-opacity-60 flex items-center justify-center rounded-3xl">
-          <p className="text-blue-600 font-semibold animate-pulse">
+
+      {/* ── Loading overlay */}
+      {loading && (
+        <div className="absolute inset-0 bg-white bg-opacity-80 flex items-center justify-center rounded-2xl">
+          <p className="text-indigo-500 text-sm font-medium animate-pulse">
             Uploading...
           </p>
         </div>
@@ -119,5 +145,7 @@ function profile({
     </div>
   );
 }
+
+import { BACKEND_URL } from "../../Components/config";
 
 export default profile;

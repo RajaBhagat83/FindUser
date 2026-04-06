@@ -11,15 +11,13 @@ import {
   searchUsers,
   us,
 } from "../../store/atoms/atom";
-import { useFetchMessage } from "../../utils/fetchMessage";
-import SearchIcon from "../input/SearchIcon.js";
 import { RiMegaphoneLine } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
 import { MdOutlineMessage } from "react-icons/md";
 import goku from "../../assets/goku.jpg";
 import Profile from "../input/Profile.js";
-import { UserIcon } from "@heroicons/react/outline";
 import Connection from "../Elements/Connection.js";
+import Searching from "../Elements/Searching.js"
 
 function Dashboard({ handleLogout }) {
   const [user, setUser] = useRecoilState(us);
@@ -28,7 +26,6 @@ function Dashboard({ handleLogout }) {
   const [users, setUsers] = useState([]);
   const [interest, setInterest] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
-  const fetchMessage = useFetchMessage();
   const [profile, setProfile] = useRecoilState(profiles);
   const [searchUser, setSearchUsers] = useRecoilState(searchUsers);
   const [ViewingOwnProfile, setViewingOwnProfile] = useState(false);
@@ -45,7 +42,6 @@ function Dashboard({ handleLogout }) {
 
   useEffect(() => {
     const term = interest.trim().toLowerCase();
-    // if (!term) return setFilteredUsers(users.filter((u) => u._id !== user._id));
     setFilteredUsers(
       users.filter(
         (u) =>
@@ -54,7 +50,6 @@ function Dashboard({ handleLogout }) {
       ),
     );
   }, [interest, users]);
-
 
   useEffect(() => {
     if (!user?._id) return;
@@ -73,30 +68,24 @@ function Dashboard({ handleLogout }) {
     })();
   }, [user, searchUser]);
 
-  const FetchMessages = (conversationId, receiver, openProfile = true) => {
-    fetchMessage(conversationId, receiver, openProfile);
-  };
-
   return (
-    <div className="w-screen h-screen flex flex-col px-12 bg-whit ">
-      <div className="flex flex-grow overflow-hidden rounded-xl ">
+    <div className="w-screen h-screen flex flex-col px-12 bg-slate-50">
+      <div className="flex flex-grow overflow-hidden rounded-xl">
         <Connection />
-        <div className="w-max-[55%] w-fit h-full border-l-4 p-4 overflow-y-auto  z-20 ">
-          <header className="w-[70%] relative -right-24 h-20 rounded-3xl bg-gradient-to-r bg-gray-100 shadow-md flex px-6 text-white font-semibold text-xl items-center justify-center top-0">
+        <div className="w-max-[55%] w-[55%] h-full border-l border-slate-200 p-4 overflow-y-auto z-20">
+
+          {/* ── Header */}
+          <header className="w-full h-14 rounded-xl bg-white border border-slate-200 flex px-6 font-semibold items-center justify-between top-0">
             <div className="flex items-center space-x-4">
               <img
-                src={
-                  user?.profilePic
-                    ? `http://localhost:8000${user.profilePic}?t=${Date.now()}`
-                    : "/default-avatar.png"
-                }
+                src={user?.profilePic ? `${user.profilePic}` : goku}
                 height="50"
                 width="50"
                 alt="avatar"
-                className="h-10 w-10 rounded-full"
+                className="h-9 w-9 rounded-full object-cover ring-2 ring-violet-100"
               />
               <span
-                className="text-black hover:bg-blue-400 cursor-pointer"
+                className="text-sm font-semibold text-slate-700 hover:text-violet-600 cursor-pointer transition-colors"
                 onClick={() => {
                   setProfile(!profile);
                   setViewingOwnProfile(!ViewingOwnProfile);
@@ -105,22 +94,28 @@ function Dashboard({ handleLogout }) {
                 {user.fullName || "User"}
               </span>
             </div>
-            <nav className="ml-auto flex items-center space-x-8">
-              <button onClick={() => navigate("/Messages")}>
-                <MdOutlineMessage color="black" className="hover:bg-blue-400" />
+            <nav className="ml-auto flex items-center space-x-1">
+              <button
+                onClick={() => navigate("/Messages")}
+                className="p-2 rounded-lg text-slate-400 hover:bg-violet-50 hover:text-violet-600 transition-colors"
+              >
+                <MdOutlineMessage size={18} />
               </button>
-              <button onClick={() => navigate("/Whatnew")}>
-                <RiMegaphoneLine color="black" className="hover:bg-blue-400" />
+              <button
+                onClick={() => navigate("/Whatnew")}
+                className="p-2 rounded-lg text-slate-400 hover:bg-violet-50 hover:text-violet-600 transition-colors"
+              >
+                <RiMegaphoneLine size={18} />
               </button>
-              <button onClick={handleLogout}>
-                <FiLogOut
-                  color="black"
-                  className=" w-12 hover:bg-blue-400"
-                  size={20}
-                />
+              <button
+                onClick={handleLogout}
+                className="p-2 rounded-lg text-slate-400 hover:bg-rose-50 hover:text-rose-500 transition-colors"
+              >
+                <FiLogOut size={18} />
               </button>
             </nav>
           </header>
+
           {profile && (
             <div>
               <Profile
@@ -131,57 +126,10 @@ function Dashboard({ handleLogout }) {
               />
             </div>
           )}
-          <Input
-            placeholder="Search users by interest..."
-            value={interest}
-            onChange={(e) => setInterest(e.target.value)}
-            className="w-[50%] mb-4 p-2 ml-5 mt-7"
-          />
-          {filteredUsers.map(({ user: u }) => (
-            <div
-              key={u._id}
-              className="w-[95%] bg-white p-4 mb-3 ml-10 rounded-lg shadow hover:bg-gray-100 cursor-pointer"
-              onClick={() => FetchMessages("new", u, true)}
-            >
-              <div className="flex items-center gap-12">
-                <img
-                  src={
-                    u?.profilePic
-                      ? `http://localhost:8000${u.profilePic}?t=${Date.now()}`
-                      : goku
-                  }
-                  className="w-44 h-44 border-4 border-gray-400 bg-gray-400 rounded-xl "
-                  alt="avatar"
-                />
-                <div className="w-80 mb-32 flex gap-7">
-                  <div className="font-semibold text-xl w-44">{u.fullName}</div>
-                  <div className="text-sm relative  max-w-56 w-fit">
-                    {u.interest}
-                  </div>
-                  <div className="text-sm relative left-44 max-w-56 w-fit">
-                    {u.isOnline ? "online" : "offline"}
-                  </div>
-                  <div className="relative h-5 w-5">
-                    <MdOutlineMessage
-                      color="black"
-                      className="hover:bg-blue-400"
-                      onClick={() => {
-                        navigate("/Messages");
-                      }}
-                    />
-                  </div>
-                  <div>
-                    <UserIcon
-                      className="w-5 h-5  relative -top-1"
-                      onClick={() => {
-                        setProfile(!profile);
-                      }}
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
+
+          {/* ── Search */}
+         <Searching />
+
         </div>
       </div>
     </div>

@@ -6,10 +6,6 @@ export const us = atom({
   default: JSON.parse(localStorage.getItem("user:details")) || {}
 })
 
-// export const addpages = atom({
-//   key:"addPage",
-//   default:false
-// });
 
 export const selectedUsers = atom({
   key:"selectedUser",

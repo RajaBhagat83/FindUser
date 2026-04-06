@@ -1,3 +1,4 @@
+require("dotenv").config(); //used to load .env variable to process.env
 const express = require("express");
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
@@ -8,18 +9,23 @@ const socketIo = require("socket.io");
 const path = require("path");
 const multer = require("multer");
 
-JWT_SECRET = "secret";
-
-require("dotenv").config(); //used to load .env variable to process.env
-require("./db/connection.js");
-
+const cloudinary = require("cloudinary").v2;
 const User = require("./models/User");
 const Conversation = require("./models/Conversation");
 const Messages = require("./models/Messages");
+JWT_SECRET = "secret";
+
+require("./db/connection.js");
 
 const app = express();
 const server = http.createServer(app);
 
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_API_NAME,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+  api_key: process.env.CLOUDINARY_API_KEY,
+});
+console.log("keu is ", process.env.CLOUDINARY_API_KEY);
 const io = socketIo(server, {
   cors: {
     origin: "*",
@@ -33,14 +39,16 @@ app.use(express.urlencoded({ extended: false }));
 //url-encoded form data ko parse karta hai
 
 app.use("/uploads", express.static("uploads")); //server uploaded images
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    return cb(null, "uploads/");
-  },
-  filename: function (req, file, cb) {
-    return cb(null, `${Date.now()}-${file.originalname}`);
-  },
-});
+
+// const storage = multer.diskStorage({
+//   destination: function (req, file, cb) {
+//     return cb(null, "uploads/");
+//   },
+//   filename: function (req, file, cb) {
+//     return cb(null, `${Date.now()}-${file.originalname}`);
+//   },
+// });
+const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 let users = []; //stores online users [{userId, socketId}]
@@ -271,9 +279,8 @@ app.post("/api/messages", async (req, res) => {
 app.get("/api/messages/:ConversationId", async (req, res) => {
   let { ConversationId } = req.params;
 
-  
-   if (ConversationId === "new") {
-    const {senderId , receiverId} = req.query;
+  if (ConversationId === "new") {
+    const { senderId, receiverId } = req.query;
     const conv = await Conversation.findOne({
       members: { $all: [senderId, receiverId] },
     });
@@ -351,31 +358,73 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
-app.post("/api/upload-profile",upload.single("profilePic"),
+app.post(
+  "/api/upload-profile",
+  upload.single("profilePic"),
   async (req, res) => {
     try {
-      const { userId } = req.body;
-      if (!userId || !req.file)
+      const file = req.file;
+      const userId = req.body;
+      console.log("User id",userId);
+      if (!userId || !req.file) {
         return res.status(400).json({ message: "Missing userId or file" });
+      }
+      console.log("file in backend", file);
 
-      const filePath = `/uploads/${req.file.filename}`;
-      const user = await User.findByIdAndUpdate(
-        userId,
-        { profilePic: filePath },
-        { new: true },
+      const uploadStream = await cloudinary.uploader.upload_stream(
+        { folder: "profile-picture" },
+        async (error, result) => {
+          if (error) {
+            return res.status(500).send({ error: "upload error" });
+          }
+
+          await User.findByIdAndUpdate(
+            userId.userId,
+            { profilePic: result.secure_url },
+            { new: true },
+          );
+          return res.status(200).json({
+            message: "upload success",
+            profilePic: result.secure_url,
+          });
+        },
       );
-      res.status(200).json({
-        message: "Profile picture updated successfully",
-        profilePic: user.profilePic,
-      });
-    } catch (err) {
-      console.error("Error uploading profile picture:", err);
-      res.status(500).json({ message: "Internal server error" });
+      const stream = require("stream");
+      const buffeStream = new stream.PassThrough();
+      buffeStream.end(file.buffer);
+      buffeStream.pipe(uploadStream);
+    } catch (error) {
+      res.status(500).json({ error: error.message });
     }
   },
 );
+
 // ===== Start Server =====
 const PORT = process.env.PORT || 8000;
 server.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+//stores the name of the images into the mongo storage and fetches and used in the frontned
+// app.post("/api/upload-profile",upload.single("profilePic"), async (req, res) => {
+//     try {
+//       const { userId } = req.body;
+//       if (!userId || !req.file)
+//         return res.status(400).json({ message: "Missing userId or file" });
+
+//       const filePath = `/uploads/${req.file.filename}`;
+//       const user = await User.findByIdAndUpdate(
+//         userId,
+//         { profilePic: filePath },
+//         { new: true },
+//       );
+//       res.status(200).json({
+//         message: "Profile picture updated successfully",
+//         profilePic: user.profilePic,
+//       });
+//     } catch (err) {
+//       console.error("Error uploading profile picture:", err);
+//       res.status(500).json({ message: "Internal server error" });
+//     }
+//   },
+// );
