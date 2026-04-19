@@ -8,11 +8,13 @@ const http = require("http");
 const socketIo = require("socket.io");
 const path = require("path");
 const multer = require("multer");
+const auth = require("./Routing/auth.js")
 
 const cloudinary = require("cloudinary").v2;
 const User = require("./models/User");
 const Conversation = require("./models/Conversation");
 const Messages = require("./models/Messages");
+const postdb = require("./models/Post.js");
 JWT_SECRET = "secret";
 
 require("./db/connection.js");
@@ -25,6 +27,7 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
   api_key: process.env.CLOUDINARY_API_KEY,
 });
+
 console.log("keu is ", process.env.CLOUDINARY_API_KEY);
 const io = socketIo(server, {
   cors: {
@@ -34,22 +37,15 @@ const io = socketIo(server, {
 });
 
 app.use(cors()); //accept request from any domain
-app.use(express.json()); //parse request
-app.use(express.urlencoded({ extended: false }));
+app.use(express.json({ limit: '50mb' })); //parse request
+app.use(express.urlencoded({ extended: false, limit: '50mb' }));
 //url-encoded form data ko parse karta hai
 
 app.use("/uploads", express.static("uploads")); //server uploaded images
-
-// const storage = multer.diskStorage({
-//   destination: function (req, file, cb) {
-//     return cb(null, "uploads/");
-//   },
-//   filename: function (req, file, cb) {
-//     return cb(null, `${Date.now()}-${file.originalname}`);
-//   },
-// });
 const storage = multer.memoryStorage();
-const upload = multer({ storage });
+ const upload = multer({ storage });
+
+app.use("/user/upload",auth);
 
 let users = []; //stores online users [{userId, socketId}]
 
@@ -358,6 +354,11 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
+app.get("/user/post",async(req,res) =>{
+  const post = await postdb.find();
+  return res.json(post);
+})
+
 app.post(
   "/api/upload-profile",
   upload.single("profilePic"),
@@ -398,6 +399,8 @@ app.post(
     }
   },
 );
+
+
 
 // ===== Start Server =====
 const PORT = process.env.PORT || 8000;

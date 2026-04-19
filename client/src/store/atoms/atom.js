@@ -64,3 +64,7 @@ export const profiles = atom({
   default:false
 });
 
+export const userpost = atom({
+  key:"userpost",
+  default:[]
+})

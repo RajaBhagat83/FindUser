@@ -36,7 +36,7 @@ function Connection({ className }) {
         ),
       );
     })();
-  }, [user, searchUser,conversation]);
+  }, [user, searchUser]);
 
   const FetchMessages = (conversationId, receiver, openProfile = true) => {
     fetchMessage(conversationId, receiver, true);
@@ -44,7 +44,7 @@ function Connection({ className }) {
 
   return (
     <div
-      className={`w-[28%] w-max-[28%] h-full p-4 overflow-y-auto bg-white border-r border-slate-200 mt-2 ${className}`}
+      className={`w-[28%] w-max-[28%] h-full p-4 overflow-y-auto bg-white border-r border-slate-200 mt-2 ${className} pt-14`}
     >
       <div className="flex flex-col gap-2">
         <SearchIcon
@@ -54,7 +54,7 @@ function Connection({ className }) {
         <div className="text-xs font-semibold tracking-widest text-slate-400 uppercase ml-7 mb-7">
           CONNECTION
         </div>
-        {conversation.map(({ conversationId, user: otherUser }) => (
+        { conversation.map(({ conversationId, user: otherUser }) => (
           <div
             key={conversationId}
             className="w-full p-4 rounded-xl hover:bg-violet-50 hover:border-violet-100 border border-transparent cursor-pointer transition-all group"

@@ -12,6 +12,8 @@ import { useFetchMessage } from "../../utils/fetchMessage";
 import { MdOutlineMessage } from "react-icons/md";
 import goku from "../../assets/goku.jpg";
 import { UserIcon } from "@heroicons/react/outline";
+import Profile
+ from "../input/Profile";
 
 
 export default function SearchUser(){
@@ -22,9 +24,9 @@ export default function SearchUser(){
   const [interest, setInterest] = useState("");
   const [filteredUsers, setFilteredUsers] = useState([]);
   const fetchMessage = useFetchMessage();
-  const [profile, setProfile] = useRecoilState(profiles);
   const [searchUser, setSearchUsers] = useRecoilState(searchUsers);
   const [ViewingOwnProfile, setViewingOwnProfile] = useState(false);
+  const [profile, setProfile] = useRecoilState(profiles);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -78,6 +80,16 @@ export default function SearchUser(){
               className="w-full mb-4 p-2 ml-5 mt-7 text-lg bg-white border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-300 placeholder-slate-400 text-slate-700 font-semibold"
             />
           </div>
+           {profile && (
+                      <div>
+                        <Profile
+                          setProfile={setProfile}
+                          profile={profile}
+                          ViewingOwnProfile={ViewingOwnProfile}
+                          setViewingOwnProfile={setViewingOwnProfile}
+                        />
+                      </div>
+              )}
 
           {/* ── User cards */}
           {filteredUsers.map(({ user: u }) => (

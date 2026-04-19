@@ -2,8 +2,10 @@ import { useRecoilState, useRecoilValue } from "recoil";
 import { messag, selectedUsers, us } from "../../store/atoms/atom";
 import { MailIcon, UserIcon, PlusCircleIcon } from "@heroicons/react/outline";
 import { useEffect, useRef, useState } from "react";
+import { BACKEND_URL } from "../../Components/config";
+import { useNavigate } from "react-router-dom";
 
-function profile({
+export default function Profile({
   setProfile,
   profile,
   ViewingOwnProfile,
@@ -12,9 +14,10 @@ function profile({
   const [user, setUser] = useRecoilState(us);
   const selectedUser = useRecoilValue(selectedUsers);
   const displayUser = ViewingOwnProfile ? user : selectedUser || user;
-  const [preview, setPreview] = useState(displayUser?.profilePic ? `$${BACKEND_URL}/uploads/${displayUser.profilePic}` : "");
+  const [preview, setPreview] = useState(displayUser?.profilePic ? `${BACKEND_URL}/uploads/${displayUser.profilePic}` : "");
   const [loading, setLoading] = useState(false);
   const fileInputRef = useRef();
+  const navigate = useNavigate();
   console.log("preview", preview);
 
   useEffect(() => {
@@ -118,6 +121,11 @@ function profile({
               {displayUser.interest}
             </span>
           </div>
+           <span className="px-3 py-1 mt-4  text-xs font-medium text-blue-600 cursor-pointer underline" onClick={() =>{
+            navigate("/Profile")
+           }}>
+              View More
+            </span>
         </div>
       </div>
 
@@ -146,6 +154,5 @@ function profile({
   );
 }
 
-import { BACKEND_URL } from "../../Components/config";
 
-export default profile;
+

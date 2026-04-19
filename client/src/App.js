@@ -4,7 +4,7 @@ import Form from "./modules/form";
 import Dashboard from "./modules/Dashboard/Dashboard";
 import Whatnew from "./Components/Whatnew";
 import Landing from "./Pages/AppLanding/Landing.jsx";
-
+import Profile from "./modules/input/Profile.js";
 import {
   Navigate,
   redirect,
@@ -15,6 +15,7 @@ import {
 import { useEffect, useState } from "react";
 import Messanging from "./modules/Elements/Messanging.js";
 import { io } from "socket.io-client";
+import Searching from "./modules/Elements/Searching.js"
 
 const ProtectedRoute = ({ children, auth = false }) => {
 
@@ -83,6 +84,8 @@ function App() {
       <Route path="/users/sign_up" element={<Form isSignin={false} setToken={setToken} setUser={setUser} />}></Route>
       <Route path="/whatnew" element={<Whatnew />} />
       <Route path="/Messages" element={<Messanging socket={socket} />} />
+      <Route path="/Search" element={<Searching  />} />
+      <Route path="/Profile" element={<Profile />} />
     </Routes>
   );
 }
