@@ -85,7 +85,7 @@ function App() {
       <Route path="/whatnew" element={<Whatnew />} />
       <Route path="/Messages" element={<Messanging socket={socket} />} />
       <Route path="/Search" element={<Searching  />} />
-      <Route path="/Profile" element={<Profile />} />
+      <Route path="/Profile/:userId" element={<Profile />} />
     </Routes>
   );
 }

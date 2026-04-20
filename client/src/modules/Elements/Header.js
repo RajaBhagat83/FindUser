@@ -34,7 +34,7 @@ export default function Header({
         <span
           className="text-sm font-semibold text-slate-700 hover:text-violet-600 cursor-pointer transition-colors"
           onClick={() => {
-            setProfile(!profile);
+           navigate(`/Profile/${user._id}`);
             setViewingOwnProfile(!ViewingOwnProfile);
           }}
         >

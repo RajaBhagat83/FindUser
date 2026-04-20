@@ -127,8 +127,9 @@ export default function SearchUser(){
                   <div>
                     <UserIcon
                       className="w-5 h-5 relative -top-1 text-slate-400 hover:text-violet-600 transition-colors"
-                      onClick={() => {
-                        setProfile(!profile);
+                      onClick={(e) => {
+                        console.log(u);
+                        navigate(`/Profile/${u.receiverId}`);
                       }}
                     />
                   </div>

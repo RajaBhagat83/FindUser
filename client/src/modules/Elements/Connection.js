@@ -94,7 +94,7 @@ function Connection({ className }) {
                 <UserIcon
                   className="w-5 h-5 relative -left-20 text-slate-400 hover:text-violet-600"
                   onClick={() => {
-                    setProfile(!profile);
+                    navigate(`/Profile/${otherUser._id}`);
                   }}
                 />
               </div>
