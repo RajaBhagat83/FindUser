@@ -11,6 +11,7 @@ import {
   searchUsers,
   us,
   userpost,
+  ViewingOwnProfiles,
 } from "../../store/atoms/atom";
 import { RiMegaphoneLine } from "react-icons/ri";
 import { FiLogOut } from "react-icons/fi";
@@ -31,7 +32,7 @@ function Dashboard({ handleLogout }) {
   const [filteredUsers, setFilteredUsers] = useState([]);
   const [profile, setProfile] = useRecoilState(profiles);
   const [searchUser, setSearchUsers] = useRecoilState(searchUsers);
-  const [ViewingOwnProfile, setViewingOwnProfile] = useState(false);
+  const [ViewingOwnProfile, setViewingOwnProfile] = useRecoilState(ViewingOwnProfiles);
   const [postUser,setPostuser] = useRecoilState(userpost)
 
   useEffect(() => {
@@ -70,7 +71,7 @@ function Dashboard({ handleLogout }) {
         ),
       );
     })();
-  }, [user, searchUser,conversation]);
+  }, [user, searchUser]);
 
   return (
     <div className="w-screen h-screen flex flex-col px-12 bg-slate-100">
@@ -79,8 +80,7 @@ function Dashboard({ handleLogout }) {
         <div className="w-max-[55%] w-[55%] h-full border-l border-slate-200 p-4 overflow-y-auto z-20">
 
           {/* ── Header */}
-          <Header  handleLogout={handleLogout} setProfile={setProfile} profile={profile} setViewingOwnProfile={setViewingOwnProfile} 
-          ViewingOwnProfile={ViewingOwnProfile} />
+          <Header  handleLogout={handleLogout} setProfile={setProfile} profile={profile}  />
           <div className="pt-14"> {/* matches h-14 */}
           </div>
           {profile && (

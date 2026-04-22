@@ -310,23 +310,11 @@ app.get("/api/messages/:ConversationId", async (req, res) => {
 //  Get Users Endpoints
 app.get("/api/users/:userId", async (req, res) => {
   const { userId } = req.params;
-  const usersData = await User.find({ _id: { $ne: userId } });
+  const usersData = await User.findOne({_id : userId});
 
-  const result = usersData.map((user) => {
-    const isOnline = users.some((u) => u.userId === user._id.toString());
-    return {
-      user: {
-        email: user.email,
-        fullName: user.fullName,
-        receiverId: user._id,
-        interest: user.interest,
-        isOnline,
-        profilePic: user.profilePic,
-      },
-    };
+  res.status(200).json({
+    "user": usersData
   });
-
-  res.status(200).json(result);
 });
 
 app.get("/api/users", async (req, res) => {
@@ -354,7 +342,7 @@ app.get("/api/users", async (req, res) => {
 });
 
 app.get("/user/post",async(req,res) =>{
-  const post = await postdb.find();
+  const post = await postdb.find().sort({_id:-1});
   return res.json(post);
 })
 

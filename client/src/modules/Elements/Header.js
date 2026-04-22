@@ -1,4 +1,4 @@
-import { us } from "../../store/atoms/atom";
+import { us, ViewingOwnProfiles } from "../../store/atoms/atom";
 import goku from "../../assets/goku.jpg";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
@@ -8,14 +8,12 @@ import { FiLogOut } from "react-icons/fi";
 
 export default function Header({
   handleLogout,
-  setViewingOwnProfile,
   setProfile,
   profile,
-  ViewingOwnProfile,
 }) {
   const [user, setUser] = useRecoilState(us);
   const navigate = useNavigate();
-
+  const [ViewingOwnProfile, setViewingOwnProfile] = useRecoilState(ViewingOwnProfiles);
   return (
     <header className="fixed top-0 left-0 right-0 z-50 h-14 bg-white/80 backdrop-blur-md border-b border-slate-100 flex items-center justify-between px-6">
       {/* Left — avatar + name */}
@@ -34,8 +32,8 @@ export default function Header({
         <span
           className="text-sm font-semibold text-slate-700 hover:text-violet-600 cursor-pointer transition-colors"
           onClick={() => {
-           navigate(`/Profile/${user._id}`);
-            setViewingOwnProfile(!ViewingOwnProfile);
+            navigate(`/Profile/${user._id}`);
+            setViewingOwnProfile(true);
           }}
         >
           {user.fullName || "User"}
@@ -66,7 +64,7 @@ export default function Header({
       {/* Right — nav icons */}
       <nav className="flex items-center gap-1">
         <button
-          onClick={() => navigate("/Messages")}
+          onClick={() =>  navigate("/Messages")}
           className="w-9 h-9 rounded-lg flex items-center justify-center text-slate-400 hover:bg-violet-50 hover:text-violet-600 transition-colors"
         >
           <MdOutlineMessage size={18} />

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useFetchMessage } from "../../utils/fetchMessage";
 import { useRecoilState } from "recoil";
 import {
@@ -41,6 +41,7 @@ function Connection({ className }) {
   const FetchMessages = (conversationId, receiver, openProfile = true) => {
     fetchMessage(conversationId, receiver, true);
   };
+  console.log("Connection is :",conversation);
 
   return (
     <div
@@ -94,7 +95,7 @@ function Connection({ className }) {
                 <UserIcon
                   className="w-5 h-5 relative -left-20 text-slate-400 hover:text-violet-600"
                   onClick={() => {
-                    navigate(`/Profile/${otherUser._id}`);
+                    navigate(`/Profile/${otherUser.receiverId}`);
                   }}
                 />
               </div>

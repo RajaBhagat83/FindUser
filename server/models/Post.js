@@ -26,7 +26,7 @@ const PostSchema = mongoose.Schema({
   ref : "User"
  }
 },
-{timestammps : true}
+{timestamps : true}
 )
 const postdb =  mongoose.model('postdb',PostSchema);
 module.exports = postdb;

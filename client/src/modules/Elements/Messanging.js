@@ -13,7 +13,7 @@ import {
 } from "../../store/atoms/atom";
 import { sendMessage } from "../../utils/sendMessage";
 import { useFetchMessage } from "../../utils/fetchMessage";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Connection from "./Connection";
 import { useRef } from "react";
 
@@ -25,7 +25,8 @@ function Messanging({ socket }) {
   const fetchMessage = useFetchMessage();
   const [online, setOnline] = useState("");
   const messageRef = useRef();
-  console.log("socket in messaging",socket);
+  const { userId }= useParams();
+
   useEffect(() => {
     messageRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages.messages]);
@@ -80,6 +81,7 @@ function Messanging({ socket }) {
     const savedUser = localStorage.getItem("selectedUser");
     if (savedUser) {
       const obj = JSON.parse(savedUser);
+      console.log("selectedUser : ",obj);
       setSelectedUser(obj);
       fetchMessage(obj.conversationId || "new", obj, false);
     }

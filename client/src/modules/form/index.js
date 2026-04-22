@@ -49,8 +49,6 @@ function Form({ isSignin = false ,setToken,setUser}) {
         localStorage.setItem("user:details", JSON.stringify(resData.user));
         setToken(resData.token);
         setUser(resData.user);
-        navigate("/DashBoard");
-        console.log("heelo user");
       } else {
         alert("Unexpected response. Please try again.");
       }

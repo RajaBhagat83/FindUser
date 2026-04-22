@@ -5,6 +5,7 @@ import { us, userpost } from "../../store/atoms/atom";
 import PostShow from "../input/PostShow.js";
 import { MdOutlineMessage } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
+import { useFetchMessage } from "../../utils/fetchMessage.js";
 
 function getInitials(name = "") {
   return name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2) || "?";
@@ -68,6 +69,11 @@ function PostCard({ p, fullName }) {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(Math.floor(Math.random() * 20));
   const navigate = useNavigate();
+  const fetchMessage = useFetchMessage();
+    const FetchMessages = (conversationId, receiver, openProfile = true) => {
+    fetchMessage(conversationId, receiver, true);
+  };
+console.log("p is :",p);
 
   return (
     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
@@ -76,7 +82,9 @@ function PostCard({ p, fullName }) {
         <SmartAvatar profilePic={p.profilePic} name={p.fullName} />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-semibold text-slate-900">{p.fullName}</span>
+            <span className="text-sm font-semibold text-slate-900 cursor-pointer" onClick={() =>{
+              navigate(`/Profile/${p.userId}`)
+            }}>{p.fullName}</span>
             {p.interest && (
               <span className="text-xs px-2.5 py-0.5 rounded-full bg-violet-50 text-violet-600 font-medium border border-violet-100">
                 {p.interest}
@@ -91,7 +99,7 @@ function PostCard({ p, fullName }) {
         {/* Message icon — only for other users */}
         {fullName !== p.fullName && (
           <button
-            onClick={() => navigate("/Messages")}
+            onClick={() =>  navigate("/Messages")}
             className="p-1.5 rounded-lg text-violet-400 hover:text-violet-600 hover:bg-violet-50 transition-colors flex-shrink-0"
           >
             <MdOutlineMessage className="w-4 h-4" />
@@ -198,9 +206,11 @@ export default function PostPage() {
 
       {/* Feed */}
       {postuser?.length > 0 &&
-        postuser.map((p, i) => (
+       <div className="flex-1 overflow-y-scroll px-2">
+        {postuser.map((p, i) => (
           <PostCard key={i} p={p} fullName={user?.fullName} />
         ))}
+       </div>}
     </div>
   );
 }

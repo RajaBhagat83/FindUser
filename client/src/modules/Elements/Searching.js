@@ -14,6 +14,7 @@ import goku from "../../assets/goku.jpg";
 import { UserIcon } from "@heroicons/react/outline";
 import Profile
  from "../input/Profile";
+import CheckAuth from "./CheckAuth";
 
 
 export default function SearchUser(){
@@ -72,6 +73,7 @@ export default function SearchUser(){
 
 
  return( <div>
+           <CheckAuth />
            <div className="pl-5">
             <Input
               placeholder="Search users by interest..."
@@ -120,7 +122,7 @@ export default function SearchUser(){
                       color="#7C3AED"
                       className="hover:bg-violet-100 rounded"
                       onClick={() => {
-                        navigate("/Messages");
+                         navigate("/Messages");
                       }}
                     />
                   </div>
@@ -128,7 +130,6 @@ export default function SearchUser(){
                     <UserIcon
                       className="w-5 h-5 relative -top-1 text-slate-400 hover:text-violet-600 transition-colors"
                       onClick={(e) => {
-                        console.log(u);
                         navigate(`/Profile/${u.receiverId}`);
                       }}
                     />

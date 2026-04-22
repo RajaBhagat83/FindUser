@@ -68,3 +68,8 @@ export const userpost = atom({
   key:"userpost",
   default:[]
 })
+
+export const ViewingOwnProfiles = atom({
+  key:"ViewingOwnProfiles",
+  default:false
+})

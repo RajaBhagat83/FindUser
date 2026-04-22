@@ -1,6 +1,6 @@
  const mongoose = require("mongoose");
 
- const url =`mongodb+srv://Buddy-Finder:1Locobgmi@cluster0.pdkbuux.mongodb.net/`;
+ const url =process.env.DATABASE_URL;
 // cd 
 
 mongoose.connect(url,{

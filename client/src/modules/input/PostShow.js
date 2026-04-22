@@ -1,6 +1,6 @@
 import { useRecoilState } from "recoil";
 import { us, userpost } from "../../store/atoms/atom";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { BACKEND_URL } from "../../Components/config";
 
 export default function PostShow({ canpost, setCanPost, setPosting: setParentPosting }) {
@@ -42,6 +42,14 @@ export default function PostShow({ canpost, setCanPost, setPosting: setParentPos
       if (setParentPosting) setParentPosting(false); // hide skeleton in PostPage
     }
   }
+
+  useEffect(() =>{
+    (async() => {
+      const allpost =  await fetch(`${BACKEND_URL}/user/post`);
+       const res = await allpost.json();
+      setUserpost(res);
+    })();
+  },[])
 
   return (
     <div

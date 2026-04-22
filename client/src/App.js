@@ -16,6 +16,8 @@ import { useEffect, useState } from "react";
 import Messanging from "./modules/Elements/Messanging.js";
 import { io } from "socket.io-client";
 import Searching from "./modules/Elements/Searching.js"
+import { ViewingOwnProfiles } from "./store/atoms/atom.js";
+import { useRecoilState } from "recoil";
 
 const ProtectedRoute = ({ children, auth = false }) => {
 
@@ -32,7 +34,7 @@ function App() {
   const [token, setToken] = useState(localStorage.getItem("user:token"));
   const [user, setUser] = useState(localStorage.getItem("user:details"));
   const [socket,setSocket] =useState(null);
-
+  const [ViewingOwnProfile, setViewingOwnProfile] = useRecoilState(ViewingOwnProfiles);
   const handleLogout = () => {
     setToken(null);
     setUser(null);
@@ -85,7 +87,7 @@ function App() {
       <Route path="/whatnew" element={<Whatnew />} />
       <Route path="/Messages" element={<Messanging socket={socket} />} />
       <Route path="/Search" element={<Searching  />} />
-      <Route path="/Profile/:userId" element={<Profile />} />
+      <Route path="/Profile/:userId" element={<Profile ViewingOwnProfile={ViewingOwnProfile} setViewingOwnProfile={setViewingOwnProfile} />} />
     </Routes>
   );
 }

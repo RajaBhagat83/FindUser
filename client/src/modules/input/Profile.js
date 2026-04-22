@@ -1,5 +1,5 @@
 import { useRecoilState, useRecoilValue } from "recoil";
-import { selectedUsers, us } from "../../store/atoms/atom";
+import { selectedUsers, us, ViewingOwnProfiles } from "../../store/atoms/atom";
 import { useEffect, useRef, useState } from "react";
 import { BACKEND_URL } from "../../Components/config";
 import { useNavigate } from "react-router-dom";
@@ -13,18 +13,29 @@ export default function ProfilePage({
   const [user, setUser] = useRecoilState(us);
   const selectedUser = useRecoilValue(selectedUsers);
   const displayUser = ViewingOwnProfile ? user : selectedUser || user;
-  const [preview, setPreview] = useState(displayUser?.profilePic || "");
+   const [pageUser,setPageUser] = useState({});
+  const [preview, setPreview] = useState(pageUser?.profilePic || "");
   const [loading, setLoading] = useState(false);
   const [usersPost, setUsersPost] = useState([]);
   const [postsLoading, setPostsLoading] = useState(true);
   const fileInputRef = useRef();
   const navigate = useNavigate();
   const { userId }= useParams();
-  console.log("userid of serarc",userId);
+ 
+
 
   useEffect(() => {
-    if (displayUser?.profilePic) setPreview(displayUser.profilePic);
-  }, [displayUser?.profilePic]);
+    if (pageUser?.profilePic) setPreview(pageUser.profilePic);
+  }, [pageUser?.profilePic]);
+
+  useEffect(() =>{
+    (async () =>{
+      const user = await fetch(`${BACKEND_URL}/api/users/${userId}`);
+      const res= await user.json();
+      setPageUser(res.user)
+    })();
+  },[])
+
 
   useEffect(() => {
     (async () => {
@@ -39,7 +50,7 @@ export default function ProfilePage({
         setPostsLoading(false);
       }
     })();
-  }, [displayUser._id]);
+  }, [pageUser._id]);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -69,6 +80,7 @@ export default function ProfilePage({
       setLoading(false);
     }
   };
+  console.log("ViewingOwnProfile",ViewingOwnProfile)
 
   return (
     <div className="min-h-screen bg-slate-50 pt-16 pb-12">
@@ -95,7 +107,7 @@ export default function ProfilePage({
                     <img src={preview} alt="avatar" className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-violet-500 text-3xl font-bold">
-                      {displayUser?.fullName?.[0]?.toUpperCase() || "U"}
+                      {pageUser?.fullName?.[0]?.toUpperCase() || "U"}
                     </div>
                   )}
                 </div>
@@ -127,24 +139,16 @@ export default function ProfilePage({
                     Message
                   </button>
                 )}
-                {ViewingOwnProfile && (
-                  <button
-                    onClick={() => {setViewingOwnProfile && setViewingOwnProfile(false); }}
-                    className="px-4 py-2 border border-slate-200 text-slate-500 hover:text-slate-700 hover:border-slate-300 text-sm font-medium rounded-xl transition-colors"
-                  >
-                    Close
-                  </button>
-                )}
               </div>
             </div>
 
             {/* Name + email */}
-            <h1 className="text-xl font-semibold text-slate-900 mb-1">{displayUser.fullName}</h1>
+            <h1 className="text-xl font-semibold text-slate-900 mb-1">{pageUser.fullName}</h1>
             <div className="flex items-center gap-1.5 text-slate-400 text-sm mb-4">
               <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
               </svg>
-              {displayUser.email}
+              {pageUser.email}
             </div>
 
             {/* Stats row */}
