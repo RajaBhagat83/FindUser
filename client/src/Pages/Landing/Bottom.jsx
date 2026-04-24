@@ -66,7 +66,7 @@ function Bottom() {
             Terms and conditions | Terms of Use | Privacy Policy | Do Not Sell
             Or Share My Personal Information | Cookie Policy | © Universe 2025
           </h1>
-          <div className=" flex gap-12 md:gap-5 ml-12 mt-12 md:mt-0 md:mr-48">
+          <div className=" flex gap-12 md:gap-5 ml-12 mt-12 md:mt-0 md:mr-48" id="contact">
             <FaTwitter size={20} />
             <FaFacebookF size={20} />
             <FaInstagram size={20} />

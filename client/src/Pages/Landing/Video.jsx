@@ -36,7 +36,7 @@ function Video() {
        transition={{
         delay:3
        }}
-      className="absolute bottom-16 right-60 text-white text-2xl pr-[420px] font-inter">
+      className="absolute bottom-9 -right-16 text-white text-2xl pr-[420px] font-inter">
         <span className="text-yellow-500 ">Search People</span><span> with Similar Interest </span><h1 className="pl-24"> and connect easily</h1>
       </motion.div>
     

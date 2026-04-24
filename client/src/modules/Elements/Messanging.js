@@ -10,6 +10,7 @@ import {
   messaging,
   selectedUsers,
   us,
+  refreshConnectionsAtom
 } from "../../store/atoms/atom";
 import { sendMessage } from "../../utils/sendMessage";
 import { useFetchMessage } from "../../utils/fetchMessage";
@@ -22,6 +23,7 @@ function Messanging({ socket }) {
   const [message, setMessage] = useRecoilState(messag);
   const [user, setUser] = useRecoilState(us);
   const [selectedUser, setSelectedUser] = useRecoilState(selectedUsers);
+  const [, setRefresh] = useRecoilState(refreshConnectionsAtom);
   const fetchMessage = useFetchMessage();
   const [online, setOnline] = useState("");
   const messageRef = useRef();
@@ -41,20 +43,24 @@ function Messanging({ socket }) {
 
     socket.emit("addUser", user._id);
     const handleGetMessage = (data) => {
+      setRefresh(r => r + 1);
       setMessages((prev) => {
-        return {
-          ...prev,
-          conversationId: data.conversationId,
-          receiverId: data.receiverId,
-          messages: [
-            ...prev.messages,
-            {
-              user: data.user,
-              message: data.message,
-              createdAt: data.createdAt,
-            },
-          ],
-        };
+        if (prev.conversationId === data.conversationId || prev.receiver?.receiverId === data.senderId) {
+          return {
+            ...prev,
+            conversationId: data.conversationId,
+            receiverId: data.receiverId,
+            messages: [
+              ...prev.messages,
+              {
+                user: data.user,
+                message: data.message,
+                createdAt: data.createdAt,
+              },
+            ],
+          };
+        }
+        return prev;
       });
     };
     socket.on("getMessage", handleGetMessage);

@@ -15,16 +15,16 @@ function Taskbar() {
       damping:8,
       stiffness:100
     }}
-    className='w-full shadow-sm'>
+    className='w-full shadow-sm z-10'>
       <div className='flex justify-between items-center h-28'>
-        <div className='text-3xl text-white ml-12 font-serif'>
-          <h1>Skill-Up Bridge</h1>
+        <div className='text-3xl text-white ml-12 font-serif cursor-pointer'>
+          <h1>Buddy-Finder</h1>
         </div>
         <div className='flex text-xl gap-12 text-[#bbc5b6] font-serif mr-56 cursor-pointer'>
-          <h1>Products</h1>
-          <h1>Pricing</h1>
-          <h1>About</h1>
-          <h1>Blog</h1>
+          <h1> <a href="#product">Products</a></h1>
+          <h1><a href="#about">About</a></h1>
+          <h1><a href="#blog" >Blog</a></h1>
+          <h1><a href="#contact" >Contact</a></h1>
         </div>
         <div className='pr-7 text-white text-sm  block gap-4'>
           <button className='border-2 border-white p-3 px-5 rounded-2xl  mr-3 active:scale-95' onClick={()=> {

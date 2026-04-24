@@ -3,8 +3,9 @@ import Button from "../../Components/Button.js";
 import Input from "../input/index.js";
 import React, { useState } from "react";
 import loginImage from "../../assets/login.png";
+import { BACKEND_URL } from "../../Components/config.js";
 
-function Form({ isSignin = false ,setToken,setUser}) {
+function Form({ isSignin = false, setToken, setUser }) {
   const [data, setData] = useState({
     ...(!isSignin && {
       fullName: "",
@@ -18,43 +19,26 @@ function Form({ isSignin = false ,setToken,setUser}) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     try {
       const res = await fetch(
-        `http://localhost:8000/api/${isSignin ? "login" : "register"}`,
+        `${BACKEND_URL}/api/${isSignin ? "login" : "register"}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
-        }
+        },
       );
-
-      if (!res.ok) {
-        const contentType = res.headers.get("content-type");
-        const isJson = contentType && contentType.includes("application/json");
-        const errorBody = isJson ? await res.json() : await res.text();
-        const errorMessage = isJson
-          ? errorBody.message || "Invalid Credentials"
-          : errorBody || "Invalid Credentials";
-
-        alert(errorMessage);
-        return;
-      }
-
       const resData = await res.json();
-      if (resData.token) {
-        localStorage.setItem("user:token", resData.token);
-        localStorage.setItem("user:details", JSON.stringify(resData.user));
-        setToken(resData.token);
-        setUser(resData.user);
-      } else {
-        alert("Unexpected response. Please try again.");
-      }
+      localStorage.setItem("user:token", resData.token);
+      localStorage.setItem("user:details", JSON.stringify(resData.user));
+      setToken(resData.token);
+      setUser(resData.user);
+      await navigate("/DashBoard");
     } catch (err) {
       console.error(err);
-      alert("Successfully Registered. Signin Now!.");
+      alert("Something went wrong. Please try again.");
     }
   };
 

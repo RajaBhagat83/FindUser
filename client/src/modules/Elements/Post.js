@@ -73,7 +73,6 @@ function PostCard({ p, fullName }) {
     const FetchMessages = (conversationId, receiver, openProfile = true) => {
     fetchMessage(conversationId, receiver, true);
   };
-console.log("p is :",p);
 
   return (
     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
@@ -99,7 +98,15 @@ console.log("p is :",p);
         {/* Message icon — only for other users */}
         {fullName !== p.fullName && (
           <button
-            onClick={() =>  navigate("/Messages")}
+            onClick={() => {
+              FetchMessages("new", {
+                receiverId: p.userId,
+                fullName: p.fullName,
+                interest: p.interest,
+                profilePic: p.profilePic
+              });
+              navigate("/Messages");
+            }}
             className="p-1.5 rounded-lg text-violet-400 hover:text-violet-600 hover:bg-violet-50 transition-colors flex-shrink-0"
           >
             <MdOutlineMessage className="w-4 h-4" />

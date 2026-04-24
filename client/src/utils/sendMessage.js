@@ -8,15 +8,8 @@ export const sendMessage = async ({
 }) => {
   if (!receiver || !message.trim()) return;
 
-  socket.emit("sendMessage", {
-    senderId: userId,
-    receiverId: receiver.receiverId,
-    ConversationId: conversationId,
-    message
-  });
-
-  // Send to backend
-  const res =await fetch("http://localhost:8000/api/messages", {
+  // 1. Send to backend FIRST to generate/resolve conversation ID
+  const res = await fetch("http://localhost:8000/api/messages", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -26,11 +19,19 @@ export const sendMessage = async ({
       receiverId: receiver.receiverId,
     }),
   });
-  const data =await res.json();
-  const neewConversationId = data.ConversationId || conversationId;
+  const data = await res.json();
+  const newConversationId = data.ConversationId || conversationId;
+
+  // 2. NOW emit the socket with the CORRECT lowercase conversationId
+  socket.emit("sendMessage", {
+    senderId: userId,
+    receiverId: receiver.receiverId,
+    conversationId: newConversationId,
+    message
+  });
 
   // Optionally refresh messages
-     if (fetchMessage) {
-    await fetchMessage(neewConversationId, receiver, false);
+  if (fetchMessage) {
+    await fetchMessage(newConversationId, receiver, false);
   }
 };

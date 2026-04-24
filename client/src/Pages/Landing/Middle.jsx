@@ -9,7 +9,7 @@ import { motion } from "framer-motion";
 
 function Middle() {
   return (
-    <div className="h-[3350px] w-full mb-8 bg-[#fbfafb]">
+    <div className="h-[3350px] w-full mb-8 bg-[#fbfafb]" >
       <div className="flex justify-between mt-3 ">
         <motion.div
           initial={{ opacity: 0, x: -100 }}
@@ -54,6 +54,7 @@ function Middle() {
             }}
              viewport={{ once: true, amount: 0.6 }}
             className="font-inter text-6xl items-center mt-7 ml-32 mb-24 "
+            id="product"
           >
             <h1>Multiply Your Output With the Power of Collaboration </h1>
           </motion.div>
@@ -122,7 +123,7 @@ function Middle() {
                viewport={{ once: true, amount: 0.6 }}
               className="font-inter text-5xl items-center ml-[340px] mt-24"
             >
-              <h1>The fastest Way to Grow your Connection </h1>
+              <h1 id="about">The fastest Way to Grow your Connection </h1>
             </motion.div>
           </div>
           <div className="flex justify-between">
@@ -237,7 +238,7 @@ function Middle() {
            viewport={{ once: true, amount: 0.6 }}
           className="font-inter text-6xl ml-[280px] mt-24  "
         >
-          <h1>Scale faster with dedicated support</h1>
+          <h1 id="blog">Scale faster with dedicated support</h1>
         </motion.div>
         <div className="flex justify-between">
           <motion.div

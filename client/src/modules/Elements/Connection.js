@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { useFetchMessage } from "../../utils/fetchMessage";
-import { useRecoilState } from "recoil";
+import { useRecoilState, useRecoilValue } from "recoil";
 import {
   conversations,
   profiles,
   searchUsers,
   us,
+  refreshConnectionsAtom
 } from "../../store/atoms/atom";
 import { MdOutlineMessage } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +20,7 @@ function Connection({ className }) {
   const [searchUser, setSearchUsers] = useRecoilState(searchUsers);
   const [conversation, setConversation] = useRecoilState(conversations);
   const [profile, setProfile] = useRecoilState(profiles);
+  const [refresh,setRefresh] = useRecoilState(refreshConnectionsAtom);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,7 +38,7 @@ function Connection({ className }) {
         ),
       );
     })();
-  }, [user, searchUser]);
+  }, [user,searchUser]);
 
   const FetchMessages = (conversationId, receiver, openProfile = true) => {
     fetchMessage(conversationId, receiver, true);

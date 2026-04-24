@@ -35,6 +35,11 @@ function Dashboard({ handleLogout }) {
   const [ViewingOwnProfile, setViewingOwnProfile] = useRecoilState(ViewingOwnProfiles);
   const [postUser,setPostuser] = useRecoilState(userpost)
 
+  useEffect(() =>{
+   const user = localStorage.getItem("user:details"); 
+    if(user)setUser(JSON.parse(user));
+  },[])
+
   useEffect(() => {
     const fetchUsers = async () => {
       const response = await fetch("http://localhost:8000/api/users");

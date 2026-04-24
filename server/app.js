@@ -75,21 +75,24 @@ io.on("connection", (socket) => {
       console.log("sender", sender);
       console.log("receiver", receiver);
       const user = await User.findById(senderId);
-      if (receiver && sender) {
-        io.to(receiver.socketId)
-          .to(sender.socketId)
-          .emit("getMessage", {
-            senderId,
-            message,
-            conversationId,
-            receiverId,
-            user: {
-              _id: user._id,
-              fullName: user.fullName,
-              email: user.email,
-              interest: user.interest,
-            },
-          });
+      const payload = {
+        senderId,
+        message,
+        conversationId,
+        receiverId,
+        user: {
+          _id: user._id,
+          fullName: user.fullName,
+          email: user.email,
+          interest: user.interest,
+        },
+      };
+
+      if (sender) {
+        io.to(sender.socketId).emit("getMessage", payload);
+      }
+      if (receiver) {
+        io.to(receiver.socketId).emit("getMessage", payload);
       }
     },
   );

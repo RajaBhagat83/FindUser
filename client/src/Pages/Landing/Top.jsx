@@ -15,7 +15,7 @@ const bgimage = {
 function Top() {
   const navigate  = useNavigate();
   return (
-    <main style={bgimage} className="rounded-t-xl mt-2 ml-2 mr-2">
+    <main style={bgimage} className="rounded-t-xl mt-2 ml-2 mr-2 ">
       <Taskbar />
       <div className=" w-full h-[550px]  ">
         <div className="flex justify-center items-center mt-[100px] ml-16">
@@ -43,12 +43,13 @@ function Top() {
                 stiffness: 100,
                 damping: 10,
               }}
+              className="text-8xl"
             >
               <h1 className="pl-64 pt-12 ">Build future</h1>
-              <h1 className="pl-0">growth with Compatible</h1>
+              <h1 className="pl-12">growth with Compatible</h1>
               <h1 className="pl-64"> individuals </h1>
             </motion.div>
-            <div className="absolute top-[587px] right-[320px]">
+            <div className="absolute top-[527px] right-[270px]">
               <motion.button
                 initial={{ opacity: 0, y: 50 }}
                 animate={{ opacity: 1, y: 0 }}

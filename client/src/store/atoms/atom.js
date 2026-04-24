@@ -73,3 +73,8 @@ export const ViewingOwnProfiles = atom({
   key:"ViewingOwnProfiles",
   default:false
 })
+
+export const refreshConnectionsAtom = atom({
+  key: "refreshConnections",
+  default: 0
+});
