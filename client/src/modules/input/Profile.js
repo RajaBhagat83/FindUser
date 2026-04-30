@@ -84,12 +84,13 @@ export default function ProfilePage({
   console.log("ViewingOwnProfile", ViewingOwnProfile);
 
   return (
-    <div className="min-h-screen bg-slate-50 pt-16 pb-12">
+    <div className="min-h-screen bg-slate-50 dark:bg-transparent pt-16 pb-12 transition-colors duration-300">
       <div className="max-w-2xl mx-auto px-4">
         {/* ── Profile Card ── */}
-        <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden mb-6">
+        <div className="bg-white/90 dark:bg-[#0f172a]/80 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-xl overflow-hidden mb-6 transition-colors duration-300">
           {/* Banner */}
-          <div className="h-28 bg-violet-700 relative">
+          <div className="h-28 bg-gradient-to-r from-violet-600 to-fuchsia-600 relative overflow-hidden">
+            <div className="absolute inset-0 bg-black/10 mix-blend-overlay"></div>
             <div
               className="absolute inset-0 opacity-20"
               style={{
@@ -102,10 +103,10 @@ export default function ProfilePage({
 
           {/* Avatar + actions row */}
           <div className="px-6 pb-6">
-            <div className="flex items-end justify-between -mt-12 mb-4">
+            <div className="flex items-end justify-between -mt-12 mb-4 relative z-10">
               {/* Avatar */}
               <div className="relative">
-                <div className="w-24 h-24 rounded-2xl border-4 border-white shadow-md overflow-hidden bg-violet-100">
+                <div className="w-24 h-24 rounded-2xl border-4 border-white dark:border-[#0f172a] shadow-md dark:shadow-xl overflow-hidden bg-violet-100 dark:bg-violet-900/50 transition-colors duration-300">
                   {preview ? (
                     <img
                       src={preview}
@@ -113,7 +114,7 @@ export default function ProfilePage({
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <div className="w-full h-full flex items-center justify-center text-violet-500 text-3xl font-bold">
+                    <div className="w-full h-full flex items-center justify-center text-violet-500 dark:text-violet-400 text-4xl font-bold bg-gradient-to-br from-violet-100 to-violet-50 dark:from-violet-900/50 dark:to-[#0f172a]">
                       {pageUser?.fullName?.[0]?.toUpperCase() || "U"}
                     </div>
                   )}
@@ -122,10 +123,10 @@ export default function ProfilePage({
                   <>
                     <button
                       onClick={() => fileInputRef.current.click()}
-                      className="absolute -bottom-1 -right-1 w-7 h-7 bg-violet-600 hover:bg-violet-700 text-white rounded-lg flex items-center justify-center shadow-sm transition-colors"
+                      className="absolute -bottom-2 -right-2 w-8 h-8 bg-violet-600 hover:bg-violet-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-violet-500/30 transition-all hover:scale-105"
                     >
                       <svg
-                        className="w-3.5 h-3.5"
+                        className="w-4 h-4"
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
@@ -158,7 +159,7 @@ export default function ProfilePage({
                       });
                       navigate("/Messages");
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-violet-500/20 hover:shadow-lg hover:shadow-violet-500/40 hover:-translate-y-0.5"
                   >
                     <svg
                       className="w-4 h-4"
@@ -176,12 +177,12 @@ export default function ProfilePage({
             </div>
 
             {/* Name + email */}
-            <h1 className="text-xl font-semibold text-slate-900 mb-1">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1 transition-colors duration-300">
               {pageUser.fullName}
             </h1>
-            <div className="flex items-center gap-1.5 text-slate-400 text-sm mb-4">
+            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm mb-6 transition-colors duration-300">
               <svg
-                className="w-3.5 h-3.5"
+                className="w-4 h-4 text-violet-500/70"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -194,30 +195,30 @@ export default function ProfilePage({
             </div>
 
             {/* Stats row */}
-            <div className="flex items-center gap-4 py-4 border-t border-b border-slate-100 mb-4">
-              <div className="text-center">
-                <div className="text-lg font-semibold text-slate-800">
+            <div className="flex items-center gap-8 py-4 border-t border-b border-slate-100 dark:border-white/5 mb-6 bg-slate-50/50 dark:bg-white/5 rounded-2xl px-6 transition-colors duration-300">
+              <div className="text-center flex-1">
+                <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300">
                   {usersPost.length}
                 </div>
-                <div className="text-xs text-slate-400 mt-0.5">Posts</div>
+                <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-0.5 uppercase tracking-widest">Posts</div>
               </div>
-              <div className="w-px h-8 bg-slate-100" />
-              <div className="text-center">
-                <div className="text-lg font-semibold text-slate-800">—</div>
-                <div className="text-xs text-slate-400 mt-0.5">Connections</div>
+              <div className="w-px h-10 bg-slate-200 dark:bg-white/10" />
+              <div className="text-center flex-1">
+                <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300">—</div>
+                <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-0.5 uppercase tracking-widest">Connections</div>
               </div>
             </div>
 
             {/* Interests */}
             <div>
-              <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-2">
+              <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 transition-colors duration-300">
                 Interests
               </p>
               <div className="flex flex-wrap gap-2">
                 {displayUser.interest?.split(",").map((tag, i) => (
                   <span
                     key={i}
-                    className="px-3 py-1 bg-violet-50 text-violet-600 text-xs font-medium rounded-full border border-violet-100"
+                    className="px-3 py-1 bg-violet-100 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 text-xs font-semibold rounded-full border border-violet-200 dark:border-violet-500/20 shadow-sm transition-colors duration-300"
                   >
                     {tag.trim()}
                   </span>
@@ -229,33 +230,33 @@ export default function ProfilePage({
 
         {/* ── Posts Section ── */}
         <div>
-          <div className="flex items-center justify-between mb-4 px-1">
-            <p className="text-xs font-semibold text-slate-400 uppercase tracking-widest">
+          <div className="flex items-center justify-between mb-4 px-2">
+            <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors duration-300">
               Posts
             </p>
-            <span className="text-xs text-slate-400">
+            <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 bg-slate-200 dark:bg-white/10 px-2.5 py-1 rounded-full transition-colors duration-300">
               {usersPost.length} total
             </span>
           </div>
 
           {/* Loading */}
           {postsLoading && (
-            <div className="flex flex-col gap-3">
+            <div className="flex flex-col gap-4">
               {[1, 2].map((i) => (
                 <div
                   key={i}
-                  className="bg-white rounded-2xl border border-slate-100 p-5 animate-pulse"
+                  className="bg-white/90 dark:bg-[#0f172a]/80 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/5 p-5 animate-pulse"
                 >
                   <div className="flex items-center gap-3 mb-4">
-                    <div className="w-10 h-10 rounded-full bg-slate-100" />
+                    <div className="w-11 h-11 rounded-full bg-slate-200 dark:bg-[#1e293b]" />
                     <div className="flex-1 space-y-2">
-                      <div className="h-3 w-1/3 bg-slate-100 rounded-full" />
-                      <div className="h-2.5 w-1/4 bg-slate-50 rounded-full" />
+                      <div className="h-3 w-1/3 bg-slate-200 dark:bg-[#1e293b] rounded-full" />
+                      <div className="h-2.5 w-1/4 bg-slate-100 dark:bg-[#1e293b]/50 rounded-full" />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <div className="h-3 w-full bg-slate-50 rounded-full" />
-                    <div className="h-3 w-3/4 bg-slate-50 rounded-full" />
+                    <div className="h-3 w-full bg-slate-100 dark:bg-[#1e293b]/50 rounded-full" />
+                    <div className="h-3 w-3/4 bg-slate-100 dark:bg-[#1e293b]/50 rounded-full" />
                   </div>
                 </div>
               ))}
@@ -264,10 +265,10 @@ export default function ProfilePage({
 
           {/* Empty */}
           {!postsLoading && usersPost.length === 0 && (
-            <div className="bg-white rounded-2xl border border-slate-100 p-10 flex flex-col items-center text-center">
-              <div className="w-14 h-14 rounded-2xl bg-slate-50 flex items-center justify-center mb-3">
+            <div className="bg-white/90 dark:bg-[#0f172a]/80 backdrop-blur-xl rounded-3xl border border-slate-200 dark:border-white/5 p-12 flex flex-col items-center text-center shadow-sm dark:shadow-xl transition-colors duration-300">
+              <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-white/5 flex items-center justify-center mb-4 border border-slate-100 dark:border-transparent">
                 <svg
-                  className="w-6 h-6 text-slate-300"
+                  className="w-8 h-8 text-slate-300 dark:text-slate-500"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -279,16 +280,16 @@ export default function ProfilePage({
                   <line x1="16" y1="17" x2="8" y2="17" />
                 </svg>
               </div>
-              <p className="text-sm font-medium text-slate-500">No posts yet</p>
-              <p className="text-xs text-slate-400 mt-1">
-                Posts will appear here
+              <p className="text-base font-semibold text-slate-700 dark:text-slate-300 transition-colors duration-300">No posts yet</p>
+              <p className="text-sm text-slate-500 dark:text-slate-500 mt-1 transition-colors duration-300">
+                When they share something, it will appear here.
               </p>
             </div>
           )}
 
           {/* Post cards */}
           {!postsLoading && usersPost.length > 0 && (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-5">
               {usersPost.map((p, i) => (
                 <PostCard key={i} p={p} />
               ))}
@@ -299,10 +300,10 @@ export default function ProfilePage({
 
       {/* Loading overlay */}
       {loading && (
-        <div className="fixed inset-0 z-50 bg-black/30 backdrop-blur-sm flex items-center justify-center">
-          <div className="bg-white rounded-2xl px-8 py-6 shadow-xl flex flex-col items-center gap-3">
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-md flex items-center justify-center animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-[#0f172a] rounded-3xl px-8 py-8 shadow-2xl dark:shadow-black/50 border border-slate-100 dark:border-white/10 flex flex-col items-center gap-4 min-w-[200px]">
             <svg
-              className="w-6 h-6 animate-spin text-violet-600"
+              className="w-8 h-8 animate-spin text-violet-600 dark:text-violet-500"
               viewBox="0 0 24 24"
               fill="none"
             >
@@ -320,7 +321,7 @@ export default function ProfilePage({
                 d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
               />
             </svg>
-            <p className="text-sm font-medium text-slate-600">
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300">
               Uploading photo...
             </p>
           </div>

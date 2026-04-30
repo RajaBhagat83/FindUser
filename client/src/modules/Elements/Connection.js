@@ -47,63 +47,75 @@ function Connection({ className }) {
 
   return (
     <div
-      className={`w-[28%] w-max-[28%] h-full p-4 overflow-y-auto bg-white border-r border-slate-200 mt-2 ${className} pt-14`}
+      className={`h-full p-6 overflow-y-auto bg-white dark:bg-transparent border-r border-slate-200 dark:border-slate-800/60 ${className} pt-24 custom-scrollbar transition-colors duration-300`}
     >
-      <div className="flex flex-col gap-2">
-        <SearchIcon
-          className="mb-4"
-          onChange={(e) => setSearchUsers(e.target.value)}
-        />
-        <div className="text-xs font-semibold tracking-widest text-slate-400 uppercase ml-7 mb-7">
-          CONNECTION
+      <div className="flex flex-col gap-4">
+        <div className="relative mb-2">
+          <SearchIcon
+            className="w-full bg-slate-50 dark:bg-[#1e293b]/50 border border-slate-200 dark:border-white/5 rounded-xl text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:ring-2 focus:ring-violet-500/50 transition-all"
+            onChange={(e) => setSearchUsers(e.target.value)}
+          />
         </div>
-        { conversation.map(({ conversationId, user: otherUser }) => (
-          <div
-            key={conversationId}
-            className="w-full p-4 rounded-xl hover:bg-violet-50 hover:border-violet-100 border border-transparent cursor-pointer transition-all group"
-            onClick={() => FetchMessages(conversationId, otherUser, true)}
-          >
-            <div className="flex items-center gap-6">
-              <img
-                src={otherUser?.profilePic ? `${otherUser.profilePic}` : goku}
-                className="w-12 h-12 border border-slate-200 bg-slate-100 rounded-xl object-cover flex-shrink-0"
-                alt="avatar"
-              />
-              <div className="">
-                <div className="font-semibold text-sm text-slate-800 w-44">
-                  {otherUser.fullName}
+        <div className="flex items-center gap-2 mb-2 px-2">
+          <div className="w-1 h-4 bg-violet-500 rounded-full"></div>
+          <div className="text-xs font-bold tracking-widest text-slate-500 dark:text-slate-400 uppercase">
+            CONNECTIONS
+          </div>
+          <div className="ml-auto bg-slate-100 dark:bg-[#1e293b] text-xs px-2 py-0.5 rounded-full text-slate-500 dark:text-slate-400">{conversation.length}</div>
+        </div>
+        
+        <div className="space-y-1">
+          { conversation.map(({ conversationId, user: otherUser }) => (
+            <div
+              key={conversationId}
+              className="w-full p-3 rounded-2xl hover:bg-slate-50 dark:hover:bg-white/5 border border-transparent hover:border-slate-200 dark:hover:border-white/10 cursor-pointer transition-all duration-300 group relative overflow-hidden"
+              onClick={() => FetchMessages(conversationId, otherUser, true)}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-violet-500/0 via-violet-500/0 to-violet-500/0 group-hover:to-violet-500/5 transition-all duration-500 pointer-events-none"></div>
+              
+              <div className="flex items-center gap-4 relative z-10">
+                <div className="relative">
+                  <img
+                    src={otherUser?.profilePic ? `${otherUser.profilePic}` : goku}
+                    className="w-12 h-12 rounded-xl object-cover flex-shrink-0 shadow-sm dark:shadow-md group-hover:shadow-violet-500/20 transition-all duration-300 border border-slate-100 dark:border-transparent"
+                    alt="avatar"
+                  />
+                  <div className={`absolute -bottom-1 -right-1 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-[#0f172a] ${otherUser.isOnline ? "bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]" : "bg-slate-300 dark:bg-slate-600"}`}></div>
                 </div>
-                <div className="text-xs text-violet-400 max-w-28 w-fit h-max-4 h-fit mt-0.5">
-                  {otherUser.interest}
+                
+                <div className="flex-1 min-w-0">
+                  <div className="font-semibold text-sm text-slate-800 dark:text-slate-200 truncate group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                    {otherUser.fullName}
+                  </div>
+                  <div className="text-xs text-violet-500 dark:text-violet-400/80 truncate mt-0.5 font-medium">
+                    {otherUser.interest}
+                  </div>
                 </div>
-              </div>
-              <span className="relative right-14">
-                {otherUser.isOnline ? (
-                  <div className="w-2 h-2 bg-emerald-400 rounded-full"></div>
-                ) : (
-                  <div className="w-2 h-2 bg-slate-300 rounded-full"></div>
-                )}
-              </span>
-              <div className="relative -left-16 opacity-0 group-hover:opacity-100 transition-opacity">
-                <MdOutlineMessage
-                  color="#7C3AED"
-                  className="hover:bg-violet-100 rounded p-0.5"
-                  onClick={() => {
-                    navigate("/Messages");
-                  }}
-                />
-              </div>
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
-                <UserIcon
-                  className="w-5 h-5 relative -left-20 text-slate-400 hover:text-violet-600"
-                  onClick={() => {
-                    navigate(`/Profile/${otherUser.receiverId}`);
-                  }}
-                />
+                
+                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+                  <div 
+                    className="p-1.5 rounded-lg hover:bg-violet-100 dark:hover:bg-violet-500/20 text-violet-500 dark:text-violet-400 hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate("/Messages");
+                    }}
+                  >
+                    <MdOutlineMessage size={18} />
+                  </div>
+                  <div 
+                    className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/50 text-slate-400 dark:text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/Profile/${otherUser.receiverId}`);
+                    }}
+                  >
+                    <UserIcon className="w-5 h-5" />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
   );

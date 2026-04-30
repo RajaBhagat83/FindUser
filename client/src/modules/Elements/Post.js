@@ -47,23 +47,22 @@ function SmartAvatar({ profilePic, name, className = "w-11 h-11" }) {
 
 function PostingSkeleton() {
   return (
-    <div className="bg-white rounded-2xl border border-violet-100 p-5 shadow-sm animate-pulse">
+    <div className="bg-white/80 dark:bg-[#0f172a]/80 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/5 p-5 shadow-sm animate-pulse transition-colors duration-300">
       <div className="flex items-center gap-3 mb-4">
-        <div className="w-11 h-11 rounded-full bg-violet-100 flex-shrink-0" />
+        <div className="w-11 h-11 rounded-full bg-slate-200 dark:bg-[#1e293b] flex-shrink-0" />
         <div className="flex-1 space-y-2">
-          <div className="h-3 w-2/5 bg-violet-100 rounded-full" />
-          <div className="h-2.5 w-1/4 bg-violet-50 rounded-full" />
+          <div className="h-3 w-2/5 bg-slate-200 dark:bg-[#1e293b] rounded-full" />
+          <div className="h-2.5 w-1/4 bg-slate-100 dark:bg-[#1e293b]/50 rounded-full" />
         </div>
       </div>
       <div className="space-y-2">
-        <div className="h-3 w-full bg-violet-50 rounded-full" />
-        <div className="h-3 w-4/5 bg-violet-50 rounded-full" />
-        <div className="h-3 w-3/5 bg-violet-50 rounded-full" />
+        <div className="h-3 w-full bg-slate-100 dark:bg-[#1e293b]/50 rounded-full" />
+        <div className="h-3 w-4/5 bg-slate-100 dark:bg-[#1e293b]/50 rounded-full" />
+        <div className="h-3 w-3/5 bg-slate-100 dark:bg-[#1e293b]/50 rounded-full" />
       </div>
     </div>
   );
 }
-
 
 function PostCard({ p, fullName }) {
   const [liked, setLiked] = useState(false);
@@ -75,23 +74,23 @@ function PostCard({ p, fullName }) {
   };
 
   return (
-    <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
+    <div className="bg-white/90 dark:bg-[#0f172a]/60 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm dark:shadow-lg hover:border-violet-300 dark:hover:border-violet-500/30 hover:shadow-md dark:hover:shadow-violet-500/10 transition-all duration-300 overflow-hidden group">
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 pt-5 pb-3">
-        <SmartAvatar profilePic={p.profilePic} name={p.fullName} />
+      <div className="flex items-center gap-4 px-5 pt-5 pb-3">
+        <SmartAvatar profilePic={p.profilePic} name={p.fullName} className="w-12 h-12 shadow-sm dark:shadow-md shadow-black/5 dark:shadow-black/20" />
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm font-semibold text-slate-900 cursor-pointer" onClick={() =>{
+            <span className="text-sm font-semibold text-slate-800 dark:text-slate-200 cursor-pointer hover:text-violet-600 dark:hover:text-white transition-colors" onClick={() =>{
               navigate(`/Profile/${p.userId}`)
             }}>{p.fullName}</span>
             {p.interest && (
-              <span className="text-xs px-2.5 py-0.5 rounded-full bg-violet-50 text-violet-600 font-medium border border-violet-100">
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-violet-100 dark:bg-violet-500/10 text-violet-600 dark:text-violet-400 font-medium border border-violet-200 dark:border-violet-500/20">
                 {p.interest}
               </span>
             )}
           </div>
           {p.interest && (
-            <p className="text-xs text-slate-400 mt-0.5 truncate">{p.interest}</p>
+            <p className="text-xs text-slate-500 mt-1 truncate font-medium">{p.interest}</p>
           )}
         </div>
 
@@ -107,51 +106,51 @@ function PostCard({ p, fullName }) {
               });
               navigate("/Messages");
             }}
-            className="p-1.5 rounded-lg text-violet-400 hover:text-violet-600 hover:bg-violet-50 transition-colors flex-shrink-0"
+            className="p-2 rounded-xl text-violet-500 dark:text-violet-400 hover:text-violet-600 dark:hover:text-violet-300 hover:bg-violet-50 dark:hover:bg-violet-500/20 transition-all flex-shrink-0 border border-transparent hover:border-violet-200 dark:hover:border-violet-500/30"
           >
-            <MdOutlineMessage className="w-4 h-4" />
+            <MdOutlineMessage className="w-5 h-5" />
           </button>
         )}
       </div>
 
       {/* Post text */}
-      <div className="px-5 pb-3">
-        <p className="text-sm text-slate-700 leading-relaxed">{p.post}</p>
+      <div className="px-5 pb-4">
+        <p className="text-sm text-slate-700 dark:text-slate-300 leading-relaxed font-normal">{p.post}</p>
       </div>
 
       {/* Post image */}
       {p.postPic && (
-        <div className="mx-5 mb-4 rounded-xl overflow-hidden border border-slate-100">
-          <img src={p.postPic} alt="post" className="w-full max-h-80 object-contain" />
+        <div className="mx-5 mb-5 rounded-xl overflow-hidden border border-slate-100 dark:border-white/5 bg-slate-50 dark:bg-[#0b1120]/50">
+          <img src={p.postPic} alt="post" className="w-full max-h-[400px] object-contain" />
         </div>
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-1 px-4 py-3 border-t border-slate-100">
+      <div className="flex items-center gap-2 px-4 py-3 border-t border-slate-100 dark:border-white/5 bg-slate-50/50 dark:bg-[#0b1120]/30 transition-colors duration-300">
         <button
           onClick={() => {
             setLiked(!liked);
             setLikes((l) => (liked ? l - 1 : l + 1));
           }}
-          className={`flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium transition-colors cursor-pointer ${
-            liked ? "text-violet-600 bg-violet-50" : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
+          className={`flex items-center gap-2 text-xs px-3 py-2 rounded-xl font-medium transition-all cursor-pointer ${
+            liked ? "text-violet-600 dark:text-violet-400 bg-violet-100 dark:bg-violet-500/10 border border-violet-200 dark:border-violet-500/20 shadow-sm shadow-violet-500/5 dark:shadow-violet-500/10" : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-white/5 border border-transparent"
           }`}
         >
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill={liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8">
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill={liked ? "currentColor" : "none"} stroke="currentColor" strokeWidth="1.8">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
           </svg>
           {likes}
         </button>
 
-        <button className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <button className="flex items-center gap-2 text-xs px-3 py-2 rounded-xl font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-white/5 transition-all cursor-pointer border border-transparent">
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
           Comment
         </button>
 
-        <button className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg font-medium text-slate-400 hover:text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">
-          <svg className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+        <button className="flex items-center gap-2 text-xs px-3 py-2 rounded-xl font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/50 dark:hover:bg-white/5 transition-all cursor-pointer border border-transparent ml-auto">
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
             <circle cx="18" cy="5" r="3" /><circle cx="6" cy="12" r="3" /><circle cx="18" cy="19" r="3" />
             <line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
             <line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
@@ -179,7 +178,7 @@ export default function PostPage() {
   }, []);
 
   return (
-    <div className="max-w-xl mx-auto px-4 py-6 flex flex-col gap-4">
+    <div className="max-w-2xl mx-auto px-4 py-6 flex flex-col gap-6">
       {/* PostShow modal */}
       {canpost && (
         <PostShow
@@ -191,21 +190,27 @@ export default function PostPage() {
 
       {/* Write a post trigger bar */}
       <div
-        className="flex items-center gap-3 bg-white border border-slate-200 rounded-2xl px-4 py-3 shadow-sm cursor-pointer hover:border-violet-300 hover:shadow-md transition-all"
+        className="flex items-center gap-4 bg-white/90 dark:bg-[#0f172a]/60 backdrop-blur-md border border-slate-200 dark:border-white/10 rounded-2xl p-4 shadow-sm dark:shadow-lg cursor-pointer hover:border-violet-300 dark:hover:border-violet-500/40 hover:shadow-md dark:hover:shadow-violet-500/20 transition-all duration-300 group"
         onClick={() => setCanPost(true)}
       >
-        <SmartAvatar profilePic={user?.profilePic} name={user?.fullName} className="w-9 h-9" />
-        <span className="text-sm text-slate-400 flex-1">What's on your mind?</span>
-        <span className="text-xs font-semibold text-violet-600 bg-violet-50 px-3 py-1.5 rounded-lg border border-violet-100">
+        <SmartAvatar profilePic={user?.profilePic} name={user?.fullName} className="w-10 h-10 shadow-sm dark:shadow-md" />
+        <div className="flex-1 bg-slate-50 dark:bg-[#1e293b]/50 border border-slate-100 dark:border-white/5 rounded-xl px-4 py-2.5 text-sm text-slate-500 dark:text-slate-400 group-hover:bg-slate-100 dark:group-hover:bg-[#1e293b] group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors">
+          What's on your mind?
+        </div>
+        <button className="text-sm font-semibold text-white bg-violet-600 hover:bg-violet-500 px-5 py-2 rounded-xl shadow-md shadow-violet-500/30 transition-all">
           Post
-        </span>
+        </button>
       </div>
 
       {/* Section label */}
       {(posting || postuser?.length > 0) && (
-        <p className="text-xs text-slate-400 uppercase tracking-widest px-1 font-medium">
-          Recent posts
-        </p>
+        <div className="flex items-center gap-3 px-1 mt-2">
+          <div className="h-px bg-slate-200 dark:bg-white/10 flex-1"></div>
+          <p className="text-xs text-slate-400 dark:text-slate-500 uppercase tracking-widest font-bold">
+            Recent posts
+          </p>
+          <div className="h-px bg-slate-200 dark:bg-white/10 flex-1"></div>
+        </div>
       )}
 
       {/* Skeleton while posting */}
@@ -213,7 +218,7 @@ export default function PostPage() {
 
       {/* Feed */}
       {postuser?.length > 0 &&
-       <div className="flex-1 overflow-y-scroll px-2">
+       <div className="flex-1 flex flex-col gap-6 pb-12">
         {postuser.map((p, i) => (
           <PostCard key={i} p={p} fullName={user?.fullName} />
         ))}
