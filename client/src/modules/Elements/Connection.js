@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";
 import { UserIcon } from "@heroicons/react/outline";
 import SearchIcon from "../input/SearchIcon.js";
 import goku from "../../assets/goku.jpg";
+import { BACKEND_URL } from "../../Components/config.js";
 
 function Connection({ className, isSidebarOpen, toggleSidebar }) {
   const [user, setUser] = useRecoilState(us);
@@ -27,7 +28,7 @@ function Connection({ className, isSidebarOpen, toggleSidebar }) {
     if (!user?._id) return;
     (async () => {
       const res = await fetch(
-        `http://localhost:8000/api/conversation/${user._id}`,
+        `${BACKEND_URL}/api/conversation/${user._id}`,
       );
       const data = await res.json();
       const search = searchUser.trim().toLowerCase();

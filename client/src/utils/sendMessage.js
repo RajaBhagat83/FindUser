@@ -1,3 +1,5 @@
+import { BACKEND_URL } from "../Components/config";
+
 export const sendMessage = async ({
   socket,
   userId,
@@ -9,7 +11,7 @@ export const sendMessage = async ({
   if (!receiver || !message.trim()) return;
 
   // 1. Send to backend FIRST to generate/resolve conversation ID
-  const res = await fetch("http://localhost:8000/api/messages", {
+  const res = await fetch(`${BACKEND_URL}/api/messages`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({

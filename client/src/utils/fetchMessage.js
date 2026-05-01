@@ -1,6 +1,7 @@
 import { useRecoilState, useRecoilValue, useSetRecoilState } from "recoil";
 import {  messaging, selectedUsers, us } from "../store/atoms/atom";
 import React from "react";
+import { BACKEND_URL } from "../Components/config";
 
 export const useFetchMessage = () => {
   const user = useRecoilValue(us);
@@ -14,8 +15,8 @@ export const useFetchMessage = () => {
     try {
       const url =
         conversationId === "new"
-          ? `http://localhost:8000/api/messages/new?senderId=${user._id}&receiverId=${receiver.receiverId}`
-          : `http://localhost:8000/api/messages/${conversationId}`;
+          ? `${BACKEND_URL}/api/messages/new?senderId=${user._id}&receiverId=${receiver.receiverId}`
+          : `${BACKEND_URL}/api/messages/${conversationId}`;
 
       const res = await fetch(url);
       const data = await res.json();

@@ -22,6 +22,7 @@ import Connection from "../Elements/Connection.js";
 import Searching from "../Elements/Searching.js"
 import PostPage from "../Elements/Post.js";
 import Header from "../Elements/Header.js";
+import { BACKEND_URL } from "../../Components/config.js";
 
 function Dashboard({ handleLogout }) {
   const [user, setUser] = useRecoilState(us);
@@ -43,7 +44,7 @@ function Dashboard({ handleLogout }) {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const response = await fetch("http://localhost:8000/api/users");
+      const response = await fetch(`${BACKEND_URL}/api/users`);
       const data = await response.json();
       setUsers(data);
       setFilteredUsers(data);
@@ -66,7 +67,7 @@ function Dashboard({ handleLogout }) {
     if (!user?._id) return;
     (async () => {
       const res = await fetch(
-        `http://localhost:8000/api/conversation/${user._id}`,
+        `${BACKEND_URL}/api/conversation/${user._id}`,
       );
       const data = await res.json();
       const search = searchUser.trim().toLowerCase();

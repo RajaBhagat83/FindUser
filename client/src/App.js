@@ -18,6 +18,7 @@ import { io } from "socket.io-client";
 import Searching from "./modules/Elements/Searching.js"
 import { ViewingOwnProfiles } from "./store/atoms/atom.js";
 import { useRecoilState } from "recoil";
+import { BACKEND_URL } from "./Components/config.js";
 
 const ProtectedRoute = ({ children, auth = false }) => {
 
@@ -43,7 +44,7 @@ function App() {
   };
 
     useEffect(() => {
-      const newSocket =  io("http://localhost:8000");
+      const newSocket =  io(`${BACKEND_URL}`);
       setSocket(newSocket);
       return () => newSocket.disconnect();
     }, []);

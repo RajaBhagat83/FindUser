@@ -15,6 +15,7 @@ import { UserIcon } from "@heroicons/react/outline";
 import Profile
  from "../input/Profile";
 import CheckAuth from "./CheckAuth";
+import { BACKEND_URL } from "../../Components/config";
 
 
 export default function SearchUser(){
@@ -31,7 +32,7 @@ export default function SearchUser(){
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const response = await fetch("http://localhost:8000/api/users");
+      const response = await fetch(`${BACKEND_URL}/api/users`);
       const data = await response.json();
       setUsers(data);
       setFilteredUsers(data);
@@ -54,7 +55,7 @@ export default function SearchUser(){
     if (!user?._id) return;
     (async () => {
       const res = await fetch(
-        `http://localhost:8000/api/conversation/${user._id}`,
+        `${BACKEND_URL}/api/conversation/${user._id}`,
       );
       const data = await res.json();
       const search = searchUser.trim().toLowerCase();
