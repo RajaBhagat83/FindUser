@@ -8,7 +8,7 @@ const http = require("http");
 const socketIo = require("socket.io");
 const path = require("path");
 const multer = require("multer");
-const auth = require("./Routing/auth.js")
+const auth = require("./Routing/auth.js");
 const connectToMongoDb = require("./db/connection.js");
 const cloudinary = require("cloudinary").v2;
 const User = require("./models/User");
@@ -31,8 +31,9 @@ cloudinary.config({
 console.log("keu is ", process.env.CLOUDINARY_API_KEY);
 const io = socketIo(server, {
   cors: {
-    origin: "*",
+    origin: "https://buddyfindera.vercel.app/",
     methods: ["GET", "POST"],
+    Credential: true,
   },
 });
 
@@ -46,15 +47,19 @@ app.use(async (req, res, next) => {
   }
 });
 
-app.use(cors()); 
-app.use(express.json({ limit: '50mb' })); 
-app.use(express.urlencoded({ extended: false, limit: '50mb' }));//url-encoded form data ko parse karta hai
+app.use(cors({
+    origin: "https://buddyfindera.vercel.app/",
+    credentials: true,
+  }),
+);
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: false, limit: "50mb" })); //url-encoded form data ko parse karta hai
 
-app.use("/uploads", express.static("uploads")); 
+app.use("/uploads", express.static("uploads"));
 const storage = multer.memoryStorage();
- const upload = multer({ storage });
+const upload = multer({ storage });
 
-app.use("/user/upload",auth);
+app.use("/user/upload", auth);
 
 let users = []; //stores online users [{userId, socketId}]
 
@@ -323,10 +328,10 @@ app.get("/api/messages/:ConversationId", async (req, res) => {
 //  Get Users Endpoints
 app.get("/api/users/:userId", async (req, res) => {
   const { userId } = req.params;
-  const usersData = await User.findOne({_id : userId});
+  const usersData = await User.findOne({ _id: userId });
 
   res.status(200).json({
-    "user": usersData
+    user: usersData,
   });
 });
 
@@ -354,10 +359,10 @@ app.get("/api/users", async (req, res) => {
   }
 });
 
-app.get("/user/post",async(req,res) =>{
-  const post = await postdb.find().sort({_id:-1});
+app.get("/user/post", async (req, res) => {
+  const post = await postdb.find().sort({ _id: -1 });
   return res.json(post);
-})
+});
 
 app.post(
   "/api/upload-profile",
@@ -366,7 +371,7 @@ app.post(
     try {
       const file = req.file;
       const userId = req.body;
-      console.log("User id",userId);
+      console.log("User id", userId);
       if (!userId || !req.file) {
         return res.status(400).json({ message: "Missing userId or file" });
       }
