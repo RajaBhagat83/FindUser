@@ -33,7 +33,8 @@ function Dashboard({ handleLogout }) {
   const [profile, setProfile] = useRecoilState(profiles);
   const [searchUser, setSearchUsers] = useRecoilState(searchUsers);
   const [ViewingOwnProfile, setViewingOwnProfile] = useRecoilState(ViewingOwnProfiles);
-  const [postUser,setPostuser] = useRecoilState(userpost)
+  const [postUser,setPostuser] = useRecoilState(userpost);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() =>{
    const user = localStorage.getItem("user:details"); 
@@ -80,12 +81,29 @@ function Dashboard({ handleLogout }) {
 
   return (
     <div className="w-screen h-screen flex flex-col bg-slate-50 dark:bg-[#0b1120] text-slate-800 dark:text-slate-200 font-sans selection:bg-violet-500/30 transition-colors duration-300">
-      <div className="flex flex-grow overflow-hidden">
-        <Connection className="w-[30%] min-w-[300px]" />
+      <div className="flex flex-grow overflow-hidden relative">
+        
+        {/* Mobile Sidebar Overlay */}
+        {isSidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm transition-opacity"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+
+        <Connection 
+          isSidebarOpen={isSidebarOpen} 
+          toggleSidebar={() => setIsSidebarOpen(false)} 
+        />
         <div className="flex-1 h-full relative overflow-y-auto bg-slate-50 dark:bg-[#0b1120] transition-colors duration-300">
 
           {/* ── Header */}
-          <Header handleLogout={handleLogout} setProfile={setProfile} profile={profile} />
+          <Header 
+            handleLogout={handleLogout} 
+            setProfile={setProfile} 
+            profile={profile} 
+            toggleSidebar={() => setIsSidebarOpen(!isSidebarOpen)}
+          />
           
           <div className="pt-24 px-8 pb-12 max-w-3xl mx-auto"> 
             {profile && (

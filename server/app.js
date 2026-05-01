@@ -9,7 +9,7 @@ const socketIo = require("socket.io");
 const path = require("path");
 const multer = require("multer");
 const auth = require("./Routing/auth.js")
-
+const connectToMongoDb = require("./db/connection.js");
 const cloudinary = require("cloudinary").v2;
 const User = require("./models/User");
 const Conversation = require("./models/Conversation");
@@ -34,6 +34,16 @@ const io = socketIo(server, {
     origin: "*",
     methods: ["GET", "POST"],
   },
+});
+
+app.use(async (req, res, next) => {
+  try {
+    await connectToMongoDb();
+    next();
+  } catch (err) {
+    console.error("DB connection failed:", err);
+    res.status(500).json({ message: "Database connection failed" });
+  }
 });
 
 app.use(cors()); 
@@ -390,34 +400,11 @@ app.post(
   },
 );
 
-
-
 // ===== Start Server =====
-const PORT = process.env.PORT || 8000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// const PORT = process.env.PORT || 8000;
+// server.listen(PORT, () => {
+//   console.log(`Server running on port ${PORT}`);
+// });
 
-//stores the name of the images into the mongo storage and fetches and used in the frontned
-// app.post("/api/upload-profile",upload.single("profilePic"), async (req, res) => {
-//     try {
-//       const { userId } = req.body;
-//       if (!userId || !req.file)
-//         return res.status(400).json({ message: "Missing userId or file" });
-
-//       const filePath = `/uploads/${req.file.filename}`;
-//       const user = await User.findByIdAndUpdate(
-//         userId,
-//         { profilePic: filePath },
-//         { new: true },
-//       );
-//       res.status(200).json({
-//         message: "Profile picture updated successfully",
-//         profilePic: user.profilePic,
-//       });
-//     } catch (err) {
-//       console.error("Error uploading profile picture:", err);
-//       res.status(500).json({ message: "Internal server error" });
-//     }
-//   },
-// );
+module.exports = app;
+module.exports = server;

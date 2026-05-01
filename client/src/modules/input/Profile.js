@@ -147,7 +147,7 @@ export default function ProfilePage({
               </div>
 
               {/* Actions */}
-              <div className="flex items-center gap-2 mt-14">
+              <div className="flex flex-col sm:flex-row items-center sm:items-end gap-3 mt-14 sm:mt-14 w-full sm:w-auto">
                 {!ViewingOwnProfile && (
                   <button
                     onClick={() => {
@@ -159,7 +159,7 @@ export default function ProfilePage({
                       });
                       navigate("/Messages");
                     }}
-                    className="flex items-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-violet-500/20 hover:shadow-lg hover:shadow-violet-500/40 hover:-translate-y-0.5"
+                    className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-violet-600 hover:bg-violet-500 text-white text-sm font-semibold rounded-xl transition-all shadow-md shadow-violet-500/20 hover:shadow-lg hover:shadow-violet-500/40 hover:-translate-y-0.5"
                   >
                     <svg
                       className="w-4 h-4"
@@ -177,10 +177,10 @@ export default function ProfilePage({
             </div>
 
             {/* Name + email */}
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1 transition-colors duration-300">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1 transition-colors duration-300 text-center sm:text-left mt-10 sm:mt-0">
               {pageUser.fullName}
             </h1>
-            <div className="flex items-center gap-2 text-slate-500 dark:text-slate-400 text-sm mb-6 transition-colors duration-300">
+            <div className="flex items-center justify-center sm:justify-start gap-2 text-slate-500 dark:text-slate-400 text-sm mb-6 transition-colors duration-300">
               <svg
                 className="w-4 h-4 text-violet-500/70"
                 viewBox="0 0 24 24"
@@ -211,10 +211,10 @@ export default function ProfilePage({
 
             {/* Interests */}
             <div>
-              <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 transition-colors duration-300">
+              <p className="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-3 transition-colors duration-300 text-center sm:text-left">
                 Interests
               </p>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap justify-center sm:justify-start gap-2">
                 {displayUser.interest?.split(",").map((tag, i) => (
                   <span
                     key={i}
@@ -385,7 +385,7 @@ function PostCard({ p }) {
       )}
 
       {/* Actions */}
-      <div className="flex items-center gap-1 px-4 py-3 border-t border-slate-100">
+      <div className="flex flex-wrap items-center gap-2 px-4 py-3 border-t border-slate-100 justify-between sm:justify-start">
         <button
           onClick={() => {
             setLiked(!liked);

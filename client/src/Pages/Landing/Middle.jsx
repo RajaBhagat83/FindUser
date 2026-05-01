@@ -53,7 +53,7 @@ function Middle() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.1 }}
-            className="text-4xl md:text-5xl font-bold mb-6"
+            className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight"
           >
             Multiply Your Output With the Power of Collaboration
           </motion.h2>
@@ -62,7 +62,7 @@ function Middle() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
-            className="text-slate-400 text-lg"
+            className="text-slate-400 text-base md:text-lg px-2"
           >
             The fastest way to grow your connection network, scale your projects, and share your insights with a community of driven individuals.
           </motion.p>
@@ -96,10 +96,10 @@ function Middle() {
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="md:w-1/2"
+            className="md:w-1/2 text-center md:text-left"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">The fastest way to grow your connection</h2>
-            <p className="text-slate-400 text-lg mb-8">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight">The fastest way to grow your connection</h2>
+            <p className="text-slate-400 text-base md:text-lg mb-8 px-4 md:px-0">
               Seamlessly expand your reach with continuous updates that drive efficiency. Find like-minded people, use intelligent filters, and keep track of everything in one place.
             </p>
           </motion.div>
@@ -121,10 +121,10 @@ function Middle() {
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="md:w-1/2"
+            className="md:w-1/2 text-center md:text-left"
           >
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">Scale faster with dedicated support</h2>
-            <ul className="space-y-4 text-slate-400 text-lg">
+            <h2 className="text-3xl md:text-5xl font-bold mb-4 md:mb-6 leading-tight">Scale faster with dedicated support</h2>
+            <ul className="space-y-4 text-slate-400 text-base md:text-lg px-4 md:px-0 text-left">
               <li className="flex items-start gap-3">
                 <span className="text-violet-500 mt-1">●</span> Share feedback to shape updates that make your journey smoother.
               </li>

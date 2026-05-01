@@ -43,7 +43,7 @@ function Form({ isSignin = false, setToken, setUser }) {
 
   return (
     <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 sm:p-8 font-sans selection:bg-violet-500/30">
-      <div className="w-full max-w-6xl h-[600px] flex rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl shadow-violet-900/20">
+      <div className="w-full max-w-6xl min-h-[500px] h-auto lg:h-[600px] flex rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 shadow-2xl shadow-violet-900/20">
         
         {/* Left Side: Dynamic Visual */}
         <div className="hidden lg:flex w-1/2 relative bg-slate-950 overflow-hidden items-center justify-center">

@@ -37,7 +37,7 @@ function Top() {
             Empowering Connections for Future Success
           </motion.div>
 
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-8 leading-tight">
+          <h1 className="text-4xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white mb-8 leading-tight">
             Build future <br className="hidden md:block" />
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">
               growth with compatible

@@ -4,13 +4,14 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { RiMegaphoneLine } from "react-icons/ri";
 import { MdOutlineMessage } from "react-icons/md";
-import { FiLogOut, FiSun, FiMoon } from "react-icons/fi";
+import { FiLogOut, FiSun, FiMoon, FiMenu } from "react-icons/fi";
 import { useState, useEffect } from "react";
 
 export default function Header({
   handleLogout,
   setProfile,
   profile,
+  toggleSidebar,
 }) {
   const [user, setUser] = useRecoilState(us);
   const navigate = useNavigate();
@@ -38,14 +39,22 @@ export default function Header({
   };
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-white/90 dark:bg-[#0f172a]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 flex items-center justify-between px-8 shadow-sm dark:shadow-black/20 transition-colors duration-300">
-      {/* Left — avatar + name */}
-      <div className="flex items-center gap-4">
+    <header className="fixed top-0 left-0 right-0 z-50 h-16 bg-white/90 dark:bg-[#0f172a]/80 backdrop-blur-xl border-b border-slate-200 dark:border-white/5 flex items-center justify-between px-4 md:px-8 shadow-sm dark:shadow-black/20 transition-colors duration-300">
+      {/* Left — hamburger + avatar + name */}
+      <div className="flex items-center gap-3 md:gap-4">
+        {toggleSidebar && (
+          <button
+            onClick={toggleSidebar}
+            className="md:hidden p-2 -ml-2 text-slate-500 hover:text-violet-600 dark:text-slate-400 dark:hover:text-violet-400 transition-colors"
+          >
+            <FiMenu size={24} />
+          </button>
+        )}
         {user?.profilePic ? (
           <img
             src={user.profilePic}
             alt="avatar"
-            className="h-10 w-10 rounded-full object-cover ring-2 ring-violet-200 dark:ring-violet-500/50 hover:ring-violet-400 transition-all cursor-pointer flex-shrink-0"
+            className="h-9 w-9 md:h-10 md:w-10 rounded-full object-cover ring-2 ring-violet-200 dark:ring-violet-500/50 hover:ring-violet-400 transition-all cursor-pointer flex-shrink-0"
             onClick={() => {
               navigate(`/Profile/${user._id}`);
               setViewingOwnProfile(true);
@@ -53,7 +62,7 @@ export default function Header({
           />
         ) : (
           <div 
-            className="h-10 w-10 rounded-full ring-2 ring-violet-200 dark:ring-violet-500/50 hover:ring-violet-400 transition-all cursor-pointer flex-shrink-0 bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-violet-500/20"
+            className="h-9 w-9 md:h-10 md:w-10 rounded-full ring-2 ring-violet-200 dark:ring-violet-500/50 hover:ring-violet-400 transition-all cursor-pointer flex-shrink-0 bg-gradient-to-br from-violet-500 to-fuchsia-600 flex items-center justify-center text-white text-sm font-bold shadow-lg shadow-violet-500/20"
             onClick={() => {
               navigate(`/Profile/${user._id}`);
               setViewingOwnProfile(true);
@@ -63,13 +72,13 @@ export default function Header({
           </div>
         )}
         <span
-          className="text-sm font-medium text-slate-700 dark:text-slate-200 hover:text-violet-600 dark:hover:text-white cursor-pointer transition-colors"
+          className="text-sm font-medium text-slate-700 dark:text-slate-200 hover:text-violet-600 dark:hover:text-white cursor-pointer transition-colors truncate max-w-[100px] sm:max-w-[150px] md:max-w-none"
           onClick={() => {
             navigate(`/Profile/${user._id}`);
             setViewingOwnProfile(true);
           }}
         >
-          {user.fullName || "User"}
+          {user?.fullName || "User"}
         </span>
       </div>
       

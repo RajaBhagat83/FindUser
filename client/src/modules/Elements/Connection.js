@@ -14,7 +14,7 @@ import { UserIcon } from "@heroicons/react/outline";
 import SearchIcon from "../input/SearchIcon.js";
 import goku from "../../assets/goku.jpg";
 
-function Connection({ className }) {
+function Connection({ className, isSidebarOpen, toggleSidebar }) {
   const [user, setUser] = useRecoilState(us);
   const fetchMessage = useFetchMessage();
   const [searchUser, setSearchUsers] = useRecoilState(searchUsers);
@@ -42,12 +42,13 @@ function Connection({ className }) {
 
   const FetchMessages = (conversationId, receiver, openProfile = true) => {
     fetchMessage(conversationId, receiver, true);
+    if (toggleSidebar) toggleSidebar(); // Close sidebar on mobile when a chat is selected
   };
   console.log("Connection is :",conversation);
 
   return (
     <div
-      className={`h-full p-6 overflow-y-auto bg-white dark:bg-transparent border-r border-slate-200 dark:border-slate-800/60 ${className} pt-24 custom-scrollbar transition-colors duration-300`}
+      className={`fixed md:relative inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'} md:translate-x-0 w-80 md:w-[30%] md:min-w-[300px] h-full p-6 overflow-y-auto bg-white dark:bg-[#0b1120] md:dark:bg-transparent border-r border-slate-200 dark:border-slate-800/60 pt-24 custom-scrollbar ${className || ''}`}
     >
       <div className="flex flex-col gap-4">
         <div className="relative mb-2">
