@@ -31,7 +31,7 @@ cloudinary.config({
 console.log("keu is ", process.env.CLOUDINARY_API_KEY);
 const io = socketIo(server, {
   cors: {
-    origin: "https://buddyfindera.vercel.app/",
+    origin: "https://buddyfindera.vercel.app",
     methods: ["GET", "POST"],
     Credential: true,
   },
