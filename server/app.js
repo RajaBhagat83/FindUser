@@ -82,13 +82,8 @@ io.on("connection", (socket) => {
   socket.on(
     "sendMessage",
     async ({ senderId, receiverId, message, conversationId }) => {
-      console.log("users in the send messages emit section", users);
-      console.log("reciverId in the send message", receiverId);
-      console.log("senderId in the send message", senderId);
       const receiver = users.find((user) => user.userId === receiverId);
       const sender = users.find((user) => user.userId === senderId);
-      console.log("sender", sender);
-      console.log("receiver", receiver);
       const user = await User.findById(senderId);
       const payload = {
         senderId,
@@ -102,12 +97,11 @@ io.on("connection", (socket) => {
           interest: user.interest,
         },
       };
-
+       if (receiver) {
+        io.to(receiver.socketId).emit("getMessage", payload);
+      }
       if (sender) {
         io.to(sender.socketId).emit("getMessage", payload);
-      }
-      if (receiver) {
-        io.to(receiver.socketId).emit("getMessage", payload);
       }
     },
   );
