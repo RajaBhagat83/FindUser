@@ -48,7 +48,7 @@ app.use(async (req, res, next) => {
 });
 
 app.use(cors({
-    origin: "https://buddyfindera.vercel.app/",
+    origin: "https://buddyfindera.vercel.app",
     credentials: true,
   }),
 );
