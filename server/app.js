@@ -31,7 +31,7 @@ cloudinary.config({
 console.log("keu is ", process.env.CLOUDINARY_API_KEY);
 const io = socketIo(server, {
   cors: {
-    origin: "https://buddyfindera.vercel.app",
+    origin: "*",
     methods: ["GET", "POST"],
     Credential: true,
   },
@@ -48,7 +48,7 @@ app.use(async (req, res, next) => {
 });
 
 app.use(cors({
-    origin: "https://buddyfindera.vercel.app",
+    origin: "*",
     credentials: true,
   }),
 );
@@ -406,10 +406,10 @@ app.post(
 );
 
 // ===== Start Server =====
-// const PORT = process.env.PORT || 8000;
-// server.listen(PORT, () => {
-//   console.log(`Server running on port ${PORT}`);
-// });
+const PORT = process.env.PORT || 8000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
 
 module.exports = app;
 module.exports = server;
