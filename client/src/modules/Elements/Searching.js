@@ -136,7 +136,6 @@ export default function SearchUser(){
                         <div 
                           className="p-2 rounded-xl bg-violet-50 dark:bg-white/5 hover:bg-violet-100 dark:hover:bg-violet-500/20 text-violet-500 dark:text-slate-400 hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
                           onClick={(e) => {
-                             e.stopPropagation();
                              navigate("/Messages");
                           }}
                         >
