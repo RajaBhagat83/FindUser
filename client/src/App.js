@@ -1,10 +1,12 @@
 import logo from "./logo.svg";
+import { lazy, Suspense } from "react";
 import "./App.css";
 import Form from "./modules/form";
-import Dashboard from "./modules/Dashboard/Dashboard";
-import Whatnew from "./Components/Whatnew";
-import Landing from "./Pages/AppLanding/Landing.jsx";
-import Profile from "./modules/input/Profile.js";
+import { CardSkeleton } from "./Components/Skeleton.js";
+const Dashboard = lazy(() => import("./modules/Dashboard/Dashboard"));
+const Whatnew = lazy(() => import("./Components/Whatnew"));
+const Landing = lazy(() => import("./Pages/AppLanding/Landing.jsx"));
+const Profile = lazy(() => import("./modules/input/Profile.js"));
 import {
   Navigate,
   redirect,
@@ -13,19 +15,21 @@ import {
   useNavigate,
 } from "react-router-dom";
 import { useEffect, useState } from "react";
-import Messanging from "./modules/Elements/Messanging.js";
+const Messanging = lazy(() => import("./modules/Elements/Messanging.js"));
 import { io } from "socket.io-client";
-import Searching from "./modules/Elements/Searching.js"
+import Searching from "./modules/Elements/Searching.js";
 import { ViewingOwnProfiles } from "./store/atoms/atom.js";
 import { useRecoilState } from "recoil";
 import { BACKEND_URL } from "./Components/config.js";
 
 const ProtectedRoute = ({ children, auth = false }) => {
-
   const isLoggedin = localStorage.getItem("user:token") !== null || false;
   if (!isLoggedin && auth) {
     return <Navigate to={"/"} />;
-  } else if ( isLoggedin && ["/users/sign_in", "/users/sign_up"].includes(window.location.pathname)  ) {
+  } else if (
+    isLoggedin &&
+    ["/users/sign_in", "/users/sign_up"].includes(window.location.pathname)
+  ) {
     return <Navigate to={"/DashBoard"} />;
   }
   return children;
@@ -34,8 +38,9 @@ const ProtectedRoute = ({ children, auth = false }) => {
 function App() {
   const [token, setToken] = useState(localStorage.getItem("user:token"));
   const [user, setUser] = useState(localStorage.getItem("user:details"));
-  const [socket,setSocket] =useState(null);
-  const [ViewingOwnProfile, setViewingOwnProfile] = useRecoilState(ViewingOwnProfiles);
+  const [socket, setSocket] = useState(null);
+  const [ViewingOwnProfile, setViewingOwnProfile] =
+    useRecoilState(ViewingOwnProfiles);
   const handleLogout = () => {
     setToken(null);
     setUser(null);
@@ -43,53 +48,64 @@ function App() {
     localStorage.removeItem("user:token");
   };
 
-    useEffect(() => {
-      const newSocket =  io(`${BACKEND_URL}`);
-      setSocket(newSocket);
-      return () => newSocket.disconnect();
-    }, []);
+  useEffect(() => {
+    const newSocket = io(`${BACKEND_URL}`);
+    setSocket(newSocket);
+    return () => newSocket.disconnect();
+  }, []);
 
   return (
-    <Routes>
-      <Route
-        path="/DashBoard"
-        element={
-          <ProtectedRoute auth={true}>
-            {token ? (
-              <Dashboard handleLogout={handleLogout}  />
-            ) : (
-              <Navigate to="/" />
-            )}
-          </ProtectedRoute>
-        }
-      />
-      <Route
-        path="/"
-        element={
-          <ProtectedRoute auth={false}>
-            {token ? (
-             <Navigate to= "/DashBoard" />
-            ) : (
-              <Landing />
-            )}
-          </ProtectedRoute>
-        }
-      />
+    <Suspense fallback={<CardSkeleton />}>
+      <Routes>
+        <Route
+          path="/DashBoard"
+          element={
+            <ProtectedRoute auth={true}>
+              {token ? (
+                <Dashboard handleLogout={handleLogout} />
+              ) : (
+                <Navigate to="/" />
+              )}
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute auth={false}>
+              {token ? <Navigate to="/DashBoard" /> : <Landing />}
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/users/sign_in"
-        element={
-          <ProtectedRoute>
-            <Form isSignin={true}  setToken={setToken} setUser={setUser}   />
-          </ProtectedRoute>
-        }
-      ></Route>
-      <Route path="/users/sign_up" element={<Form isSignin={false} setToken={setToken} setUser={setUser} />}></Route>
-      <Route path="/whatnew" element={<Whatnew />} />
-      <Route path="/Messages" element={<Messanging socket={socket} />} />
-      <Route path="/Search" element={<Searching  />} />
-      <Route path="/Profile/:userId" element={<Profile ViewingOwnProfile={ViewingOwnProfile} setViewingOwnProfile={setViewingOwnProfile} />} />
-    </Routes>
+        <Route
+          path="/users/sign_in"
+          element={
+            <ProtectedRoute>
+              <Form isSignin={true} setToken={setToken} setUser={setUser} />
+            </ProtectedRoute>
+          }
+        ></Route>
+        <Route
+          path="/users/sign_up"
+          element={
+            <Form isSignin={false} setToken={setToken} setUser={setUser} />
+          }
+        ></Route>
+        <Route path="/whatnew" element={<Whatnew />} />
+        <Route path="/Messages" element={<Messanging socket={socket} />} />
+        <Route path="/Search" element={<Searching />} />
+        <Route
+          path="/Profile/:userId"
+          element={
+            <Profile
+              ViewingOwnProfile={ViewingOwnProfile}
+              setViewingOwnProfile={setViewingOwnProfile}
+            />
+          }
+        />
+      </Routes>
+    </Suspense>
   );
 }
 

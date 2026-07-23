@@ -31,6 +31,7 @@ function SmartAvatar({ profilePic, name, className = "w-11 h-11" }) {
     return (
       <img
         src={profilePic}
+        loading="lazy"
         alt={name}
         onError={() => setError(true)}
         className={`${className} rounded-full object-cover ring-2 ring-white shadow-sm flex-shrink-0`}
@@ -117,7 +118,7 @@ function PostCard({ p, fullName }) {
       {/* Post image */}
       {p.postPic && (
         <div className="w-full bg-slate-50 dark:bg-black/20 border-y border-slate-100 dark:border-white/5 flex items-center justify-center overflow-hidden">
-          <img src={p.postPic} alt="post" className="w-full h-auto max-h-[500px] md:max-h-[650px] object-contain" />
+          <img src={p.postPic} loading="lazy" alt="post" className="w-full h-auto max-h-[500px] md:max-h-[650px] object-contain" />
         </div>
       )}
 

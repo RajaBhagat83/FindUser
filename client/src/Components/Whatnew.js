@@ -25,6 +25,7 @@ const TeamPage = () => {
                   <img
                     src={`https://via.placeholder.com/60`}
                     alt="Profile"
+                    loading="lazy"
                     className="rounded-full w-16 h-16"
                   />
                   <div>
@@ -73,6 +74,7 @@ const TeamPage = () => {
                   <img
                     src="https://via.placeholder.com/60"
                     alt="User"
+                    loading="lazy"
                     className="rounded-full w-14 h-14"
                   />
                   <div>

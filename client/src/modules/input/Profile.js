@@ -110,6 +110,7 @@ export default function ProfilePage({
                   {preview ? (
                     <img
                       src={preview}
+                      loading="lazy"
                       alt="avatar"
                       className="w-full h-full object-cover"
                     />
@@ -331,7 +332,7 @@ export default function ProfilePage({
   );
 }
 
-// ── PostCard ──────────────────────────────────────────────────────────────────
+
 function PostCard({ p }) {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(Math.floor(Math.random() * 20));
@@ -347,6 +348,7 @@ function PostCard({ p }) {
           {p.profilePic ? (
             <img
               src={p.profilePic}
+              loading="lazy"
               alt={p.fullName}
               className="w-full h-full object-cover"
             />
@@ -384,6 +386,7 @@ function PostCard({ p }) {
           <img
             src={p.postPic}
             alt="post"
+            loading="lazy"
             className="w-full max-h-72 object-contain bg-slate-50"
           />
         </div>

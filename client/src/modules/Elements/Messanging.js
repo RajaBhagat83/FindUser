@@ -149,6 +149,7 @@ function Messanging({ socket }) {
                   <div className="relative">
                     <img
                       src={selectedUser?.profilePic ? `${selectedUser.profilePic}` : Avatar }
+                      loading="lazy"
                       className="w-10 h-10 rounded-full object-cover ring-2 ring-violet-200 dark:ring-violet-500/30 shadow-sm dark:shadow-md"
                       alt="avatar"
                     />
@@ -162,7 +163,7 @@ function Messanging({ socket }) {
                   </div>
                 </div>
                 <div className="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-white/10 transition-colors cursor-pointer border border-transparent dark:border-white/5">
-                  <img src={Phone} className="w-5 h-5 opacity-50 dark:opacity-70 dark:filter dark:invert" alt="phone" />
+                  <img src={Phone} loading="lazy" className="w-5 h-5 opacity-50 dark:opacity-70 dark:filter dark:invert" alt="phone" />
                 </div>
               </div>
 
@@ -214,6 +215,7 @@ function Messanging({ socket }) {
                   >
                     <img
                       src={Payment}
+                      loading="lazy"
                       className="w-5 h-5 opacity-40 hover:opacity-80 dark:opacity-60 dark:hover:opacity-100 transition-opacity dark:filter dark:invert"
                       alt="payment"
                     />
@@ -234,7 +236,7 @@ function Messanging({ socket }) {
                     disabled={!message.trim()}
                     className="w-10 h-10 rounded-xl bg-violet-600 hover:bg-violet-500 disabled:opacity-40 disabled:hover:bg-violet-600 disabled:cursor-not-allowed transition-all flex items-center justify-center shadow-md dark:shadow-lg dark:shadow-violet-500/20 group flex-shrink-0"
                   >
-                    <img src={messageIcon} className="w-4 h-4 filter invert group-hover:scale-110 transition-transform" alt="send" />
+                    <img src={messageIcon} loading="lazy" className="w-4 h-4 filter invert group-hover:scale-110 transition-transform" alt="send" />
                   </button>
                 </div>
               </div>

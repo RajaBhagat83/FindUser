@@ -58,6 +58,7 @@ export default function Header({
             <img
               src={user.profilePic}
               alt="avatar"
+              loading="lazy"
               className="h-9 w-9 sm:h-10 sm:w-10 rounded-full object-cover ring-2 ring-violet-100 dark:ring-violet-500/30 group-hover:ring-violet-400 transition-all"
             />
           ) : (

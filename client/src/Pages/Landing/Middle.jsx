@@ -110,7 +110,7 @@ function Middle() {
             className="md:w-1/2"
           >
             <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-indigo-500/20 border border-slate-800 bg-slate-900/30 p-4">
-              <img src={Connection} alt="Connections Dashboard" className="w-full h-auto object-contain max-h-[400px] mx-auto opacity-90 hover:opacity-100 transition-opacity" />
+              <img src={Connection} loading="lazy" alt="Connections Dashboard" className="w-full h-auto object-contain max-h-[400px] mx-auto opacity-90 hover:opacity-100 transition-opacity" />
             </div>
           </motion.div>
         </div>
@@ -143,7 +143,7 @@ function Middle() {
             className="md:w-1/2"
           >
             <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-violet-500/20 border border-slate-800 flex justify-center bg-slate-900/30 p-4">
-              <img src={World} alt="Global Network" className="w-full h-auto object-contain max-h-[400px] mx-auto opacity-90 hover:opacity-100 transition-opacity drop-shadow-2xl" />
+              <img src={World} loading="lazy" alt="Global Network" className="w-full h-auto object-contain max-h-[400px] mx-auto opacity-90 hover:opacity-100 transition-opacity drop-shadow-2xl" />
             </div>
           </motion.div>
         </div>

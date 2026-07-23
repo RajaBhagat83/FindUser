@@ -98,6 +98,7 @@ function Connection({ className, isSidebarOpen, toggleSidebar }) {
                     src={
                       otherUser?.profilePic ? `${otherUser.profilePic}` : goku
                     }
+                    loading="lazy"
                     className="w-12 h-12 rounded-xl object-cover flex-shrink-0 shadow-sm dark:shadow-md group-hover:shadow-violet-500/20 transition-all duration-300 border border-slate-100 dark:border-transparent"
                     alt="avatar"
                   />

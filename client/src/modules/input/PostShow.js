@@ -47,7 +47,7 @@ export default function PostShow({ canpost, setCanPost, setPosting: setParentPos
     (async() => {
       const allpost =  await fetch(`${BACKEND_URL}/user/post`);
        const res = await allpost.json();
-      setUserpost(res);
+       setUserpost(res);
     })();
   },[])
 
@@ -98,6 +98,7 @@ export default function PostShow({ canpost, setCanPost, setPosting: setParentPos
           <div className="px-5 pb-3 relative">
             <img
               src={URL.createObjectURL(image)}
+              loading="lazy"
               alt="preview"
               className="w-full h-auto max-h-64 object-contain rounded-xl border border-slate-100 bg-slate-50 dark:bg-black/20"
             />

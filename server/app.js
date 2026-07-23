@@ -28,7 +28,6 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
 });
 
-console.log("keu is ", process.env.CLOUDINARY_API_KEY);
 const io = socketIo(server, {
   cors: {
     origin: "*",
@@ -354,7 +353,8 @@ app.get("/api/users", async (req, res) => {
 });
 
 app.get("/user/post", async (req, res) => {
-  const post = await postdb.find().sort({ _id: -1 });
+  const post = await postdb.find().sort({ _id: -1 }).limit(10);
+  console.log("post ",post.length());
   return res.json(post);
 });
 
@@ -365,12 +365,9 @@ app.post(
     try {
       const file = req.file;
       const userId = req.body;
-      console.log("User id", userId);
       if (!userId || !req.file) {
         return res.status(400).json({ message: "Missing userId or file" });
       }
-      console.log("file in backend", file);
-
       const uploadStream = await cloudinary.uploader.upload_stream(
         { folder: "profile-picture" },
         async (error, result) => {
@@ -399,7 +396,7 @@ app.post(
   },
 );
 
-// ===== Start Server =====
+// // ===== Start Server =====
 // const PORT = process.env.PORT || 8000;
 // server.listen(PORT, () => {
 //   console.log(`Server running on port ${PORT}`);

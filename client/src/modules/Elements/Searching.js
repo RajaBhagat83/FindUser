@@ -124,7 +124,7 @@ export default function SearchUser() {
               <div className="flex items-center gap-4">
                 <div className="relative">
                   <img
-                    src={u?.profilePic ? `${u.profilePic}` : goku}
+                    src={u?.profilePic ? `${u.profilePic}` : goku} loading="lazy"
                     className="w-14 h-14 rounded-2xl object-cover flex-shrink-0 shadow-sm dark:shadow-md group-hover:shadow-violet-500/20 transition-all duration-300 border border-slate-100 dark:border-transparent"
                     alt="avatar"
                   />
