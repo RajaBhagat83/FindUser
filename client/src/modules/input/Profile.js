@@ -19,6 +19,8 @@ export default function ProfilePage({
   const [loading, setLoading] = useState(false);
   const [usersPost, setUsersPost] = useState([]);
   const [postsLoading, setPostsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [isFetching,setIsFetching] = useState(false);
   const fileInputRef = useRef();
   const navigate = useNavigate();
   const { userId } = useParams();
@@ -39,16 +41,36 @@ export default function ProfilePage({
     (async () => {
       try {
         setPostsLoading(true);
-        const res = await fetch(`${BACKEND_URL}/user/upload/getpost/${userId}`);
+        const res = await fetch(
+          `${BACKEND_URL}/user/upload/getpost/${userId}?limit=5&page=${page}`,
+        );
         const data = await res.json();
-        setUsersPost(data.Userpost || []);
+        setUsersPost((prev) => [...prev, ...data.Userpost]);
       } catch (err) {
         console.error(err);
       } finally {
         setPostsLoading(false);
       }
     })();
-  }, [pageUser._id]);
+  }, [page]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if(isFetching)return;
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 200
+      ) {
+        setIsFetching(true);
+        setPage((p) => p + 1);
+      }
+      }
+        window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    }
+   
+  }, [isFetching]);
 
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
@@ -78,7 +100,7 @@ export default function ProfilePage({
       setLoading(false);
     }
   };
-     const FetchMessages = (conversationId, receiver, openProfile = true) => {
+  const FetchMessages = (conversationId, receiver, openProfile = true) => {
     fetchMessage(conversationId, receiver, true);
   };
   console.log("ViewingOwnProfile", ViewingOwnProfile);
@@ -201,12 +223,18 @@ export default function ProfilePage({
                 <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300">
                   {usersPost.length}
                 </div>
-                <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-0.5 uppercase tracking-widest">Posts</div>
+                <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-0.5 uppercase tracking-widest">
+                  Posts
+                </div>
               </div>
               <div className="w-px h-10 bg-slate-200 dark:bg-white/10" />
               <div className="text-center flex-1">
-                <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300">—</div>
-                <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-0.5 uppercase tracking-widest">Connections</div>
+                <div className="text-2xl font-bold text-slate-800 dark:text-slate-200 transition-colors duration-300">
+                  —
+                </div>
+                <div className="text-xs font-semibold text-slate-400 dark:text-slate-500 mt-0.5 uppercase tracking-widest">
+                  Connections
+                </div>
               </div>
             </div>
 
@@ -281,7 +309,9 @@ export default function ProfilePage({
                   <line x1="16" y1="17" x2="8" y2="17" />
                 </svg>
               </div>
-              <p className="text-base font-semibold text-slate-700 dark:text-slate-300 transition-colors duration-300">No posts yet</p>
+              <p className="text-base font-semibold text-slate-700 dark:text-slate-300 transition-colors duration-300">
+                No posts yet
+              </p>
               <p className="text-sm text-slate-500 dark:text-slate-500 mt-1 transition-colors duration-300">
                 When they share something, it will appear here.
               </p>
@@ -291,8 +321,8 @@ export default function ProfilePage({
           {/* Post cards */}
           {!postsLoading && usersPost.length > 0 && (
             <div className="flex flex-col gap-5">
-              {usersPost.map((p, i) => (
-                <PostCard key={i} p={p} />
+              {usersPost.map((p) => (
+                <PostCard key={p._id} p={p} />
               ))}
             </div>
           )}
@@ -332,7 +362,6 @@ export default function ProfilePage({
   );
 }
 
-
 function PostCard({ p }) {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(Math.floor(Math.random() * 20));
@@ -341,7 +370,7 @@ function PostCard({ p }) {
     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 overflow-hidden">
       {/* Header */}
       <div className="flex items-center gap-3 px-5 pt-5 pb-3">
-         {/* <div className="absolute top-3 left-[500px] px-4 py-2 bg-gray-200 cursor-pointer" onClick={() =>{
+        {/* <div className="absolute top-3 left-[500px] px-4 py-2 bg-gray-200 cursor-pointer" onClick={() =>{
           
          }}>delete</div> */}
         <div className="w-10 h-10 rounded-full overflow-hidden bg-violet-100 flex-shrink-0">
@@ -358,7 +387,7 @@ function PostCard({ p }) {
             </div>
           )}
         </div>
-      
+
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm font-semibold text-slate-900">
@@ -370,11 +399,11 @@ function PostCard({ p }) {
               </span>
             )}
           </div>
-         
+
           <p className="text-xs text-slate-400 mt-0.5">Recently posted</p>
         </div>
       </div>
-   
+
       {/* Body */}
       <div className="px-5 pb-3">
         <p className="text-sm text-slate-700 leading-relaxed">{p.post}</p>

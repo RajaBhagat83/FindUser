@@ -2,6 +2,7 @@ const postdb = require("../models/Post.js");
 const cloudinary = require("cloudinary").v2;
 const stream = require("stream");
 const User = require("../models/User.js");
+const mongoose = require("mongoose");
 
 const Post = async (req, res) => {
   const { userId } = req.params;
@@ -11,12 +12,17 @@ const Post = async (req, res) => {
   if (!post?.trim() || !userId) {
     return res.status(400).json({ message: "Post or userId missing" });
   }
+
+  if (!mongoose.Types.ObjectId.isValid(userId)) {
+    return res.status(400).json({ message: "Invalid userId format" });
+  }
+
+  try {
     const userfound = await User.findById(userId);
     if(!userfound){
       return res.status(404).json("user not found");
     }
-    console.log("hey");
-  try {
+
     let imageUrl = "";
     if (file) {
       imageUrl = await new Promise((resolve, reject) => {

@@ -3,7 +3,11 @@ import { us, userpost } from "../../store/atoms/atom";
 import { useState, useRef, useEffect } from "react";
 import { BACKEND_URL } from "../../Components/config";
 
-export default function PostShow({ canpost, setCanPost, setPosting: setParentPosting }) {
+export default function PostShow({
+  canpost,
+  setCanPost,
+  setPosting: setParentPosting,
+}) {
   const [user] = useRecoilState(us);
   const [post, setPost] = useState("");
   const [postuser, setUserpost] = useRecoilState(userpost);
@@ -11,6 +15,8 @@ export default function PostShow({ canpost, setCanPost, setPosting: setParentPos
   const fileInputRef = useRef(null);
   const [image, setImage] = useState(null);
   const [posting, setPosting] = useState(false);
+  const [page, setPage] = useState(1);
+  const [isFetching, setIsFetching] = useState(false);
 
   async function sendPost() {
     if (!post.trim()) return;
@@ -24,32 +30,70 @@ export default function PostShow({ canpost, setCanPost, setPosting: setParentPos
     if (image) formdata.append("image", image);
 
     try {
-      await fetch(`${BACKEND_URL}/user/upload/upload-post/${user._id}`, {
-        method: "POST",
-        body: formdata,
-      });
+      const uploadResponse = await fetch(
+        `${BACKEND_URL}/user/upload/upload-post/${user._id}`,
+        {
+          method: "POST",
+          body: formdata,
+        },
+      );
+      if (!uploadResponse.ok) {
+        throw new Error(`Post upload failed: ${uploadResponse.status}`);
+      }
       setPost("");
       setImage(null);
       if (setParentPosting) setParentPosting(true); // show skeleton in PostPage
       setCanPost(false);
-      const allpost = await fetch(`${BACKEND_URL}/user/post`);
-      const res = await allpost.json();
-      setUserpost(res);
+      const response = await fetch(
+        `${BACKEND_URL}/user/post?limit=10&page=${page}`,
+      );
+      if (!response.ok) {
+        throw new Error(`Failed to refresh posts: ${response.status}`);
+      }
+      const res = await response.json();
+      setUserpost((prev) => [...prev, ...res]);
     } catch (err) {
       console.log("error while sending post:", err.message);
     } finally {
+      setIsFetching(false);
       setPosting(false);
       if (setParentPosting) setParentPosting(false); // hide skeleton in PostPage
     }
   }
-
-  useEffect(() =>{
-    (async() => {
-      const allpost =  await fetch(`${BACKEND_URL}/user/post`);
-       const res = await allpost.json();
-       setUserpost(res);
+  
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await fetch(`${BACKEND_URL}/user/post?limit=10&page=${page}`);
+        if (!response.ok) {
+          throw new Error(`Failed to load posts: ${response.status}`);
+        }
+        const res = await response.json();
+        setUserpost((prev) =>[...prev,...res]);
+      } catch (error) {
+        console.error("Error while fetching posts:", error);
+      }finally{
+        setIsFetching(false);
+      }
     })();
-  },[])
+  }, [page]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (isFetching) return;
+      if (
+        window.innerHeight + window.scrollY >=
+        document.body.offsetHeight - 200
+      ) {
+        setIsFetching(true);
+        setPage((p) => p + 1);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [isFetching]);
 
   return (
     <div
@@ -68,7 +112,9 @@ export default function PostShow({ canpost, setCanPost, setPosting: setParentPos
             {user?.fullName?.[0]?.toUpperCase() || "U"}
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold text-gray-900">{user?.fullName || "You"}</p>
+            <p className="text-sm font-semibold text-gray-900">
+              {user?.fullName || "You"}
+            </p>
             <p className="text-xs text-gray-400">Share with your network</p>
           </div>
           <button
@@ -148,7 +194,9 @@ export default function PostShow({ canpost, setCanPost, setPosting: setParentPos
           {/* Char count + Post button */}
           <div className="flex items-center gap-3">
             {post.length > 0 && (
-              <span className={`text-xs tabular-nums ${post.length > 280 ? "text-red-400" : "text-gray-300"}`}>
+              <span
+                className={`text-xs tabular-nums ${post.length > 280 ? "text-red-400" : "text-gray-300"}`}
+              >
                 {post.length}/300
               </span>
             )}
@@ -163,9 +211,24 @@ export default function PostShow({ canpost, setCanPost, setPosting: setParentPos
             >
               {posting ? (
                 <>
-                  <svg className="w-3.5 h-3.5 animate-spin" viewBox="0 0 24 24" fill="none">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" />
+                  <svg
+                    className="w-3.5 h-3.5 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
                   </svg>
                   Posting…
                 </>
