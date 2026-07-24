@@ -28,13 +28,9 @@ function Dashboard({ handleLogout }) {
   const [user, setUser] = useRecoilState(us);
   const navigate = useNavigate();
   const [conversation, setConversation] = useRecoilState(conversations);
-  const [users, setUsers] = useState([]);
-  const [interest, setInterest] = useState("");
-  const [filteredUsers, setFilteredUsers] = useState([]);
   const [profile, setProfile] = useRecoilState(profiles);
   const [searchUser, setSearchUsers] = useRecoilState(searchUsers);
-  const [ViewingOwnProfile, setViewingOwnProfile] =
-    useRecoilState(ViewingOwnProfiles);
+  const [ViewingOwnProfile, setViewingOwnProfile] =useRecoilState(ViewingOwnProfiles);
   const [postUser, setPostuser] = useRecoilState(userpost);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -43,53 +39,6 @@ function Dashboard({ handleLogout }) {
     if (user) setUser(JSON.parse(user));
   }, []);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const response = await fetch(`${BACKEND_URL}/api/users`);
-      const data = await response.json();
-      setUsers(data);
-      setFilteredUsers(data);
-    };
-    fetchUsers();
-  }, []);
-
-  useEffect(() => {
-    const term = interest.trim().toLowerCase();
-    let timer = setTimeout(() => {
-      setFilteredUsers(
-        users.filter(
-          (u) =>
-            u.user.interest?.toLowerCase().includes(term) &&
-            u.user.email !== user.email,
-        ),
-      );
-    }, 500);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [interest, users]);
-  
- let timer ;
-  useEffect(() => {
-    if (!user?._id) return;
-    const datafilter = async () => {
-      const res = await fetch(`${BACKEND_URL}/api/conversation/${user._id}`);
-      const data = await res.json();
-       timer = setTimeout(() => {
-        const search = searchUser.trim().toLowerCase();
-        if (!search) return setConversation(data);
-
-        setConversation(
-          data.filter((item) =>
-            item.user?.fullName?.toLowerCase().includes(search),
-          ),
-        );
-      }, 500);
-    }
-    datafilter();
-    return ()=>clearTimeout(timer);
-  }, [user, searchUser]);
 
   return (
     <div className="w-screen h-screen flex flex-col bg-slate-50 dark:bg-[#0b1120] text-slate-800 dark:text-slate-200 font-sans selection:bg-violet-500/30 transition-colors duration-300">

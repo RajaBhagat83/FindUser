@@ -73,7 +73,7 @@ function PostingSkeleton() {
   );
 }
 
-function PostCard({ p, fullName }) {
+const PostCard = React.memo(function PostCard({ p, fullName }) {
   const [liked, setLiked] = useState(false);
   const [likes, setLikes] = useState(Math.floor(Math.random() * 20));
   const navigate = useNavigate();
@@ -214,7 +214,7 @@ function PostCard({ p, fullName }) {
       </div>
     </div>
   );
-}
+});
 
 export default function PostPage() {
   const [user] = useRecoilState(us);
