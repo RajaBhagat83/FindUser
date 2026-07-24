@@ -30,10 +30,12 @@ function Connection({ className, isSidebarOpen, toggleSidebar }) {
 
     const fetchConversations = async () => {
       try {
-        timer = setTimeout(async() => {
-        const res = await fetch(`${BACKEND_URL}/api/conversation/${user._id}`);
-        const data = await res.json();
-      
+        timer = setTimeout(async () => {
+          const res = await fetch(
+            `${BACKEND_URL}/api/conversation/${user._id}`,
+          );
+          const data = await res.json();
+
           const search = searchUser.trim().toLowerCase();
           if (!search) return setConversation(data);
           setConversation(
@@ -62,11 +64,10 @@ function Connection({ className, isSidebarOpen, toggleSidebar }) {
     if (toggleSidebar) toggleSidebar(); // Close sidebar on mobile when a chat is selected
   };
 
-
   return (
-   <div
-  className={`fixed md:relative inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 w-80 md:w-[30%] md:min-w-[300px] h-full p-6 bg-white dark:bg-[#0b1120] md:dark:bg-transparent border-r border-slate-200 dark:border-slate-800/60 pt-24 ${className || ""}`}
->
+    <div
+      className={`fixed md:relative inset-y-0 left-0 z-40 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} md:translate-x-0 w-80 md:w-[30%] md:min-w-[300px] h-full p-6 overflow-y-auto bg-white dark:bg-[#0b1120] md:dark:bg-transparent border-r border-slate-200 dark:border-slate-800/60 pt-24 custom-scrollbar ${className || ""}`}
+    >
       <div className="flex flex-col gap-4">
         <div className="relative mb-2">
           <SearchIcon
