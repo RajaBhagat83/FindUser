@@ -354,7 +354,6 @@ app.get("/api/users", async (req, res) => {
 
 app.get("/user/post", async (req, res) => {
   const post = await postdb.find().sort({ _id: -1 }).limit(10);
-  console.log("post ",post.length());
   return res.json(post);
 });
 
