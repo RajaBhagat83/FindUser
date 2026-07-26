@@ -46,8 +46,7 @@ app.use(async (req, res, next) => {
   }
 });
 
-app.use(
-  cors({
+app.use(cors({
     origin: "*",
     credentials: true,
   }),
@@ -97,7 +96,7 @@ io.on("connection", (socket) => {
           interest: user.interest,
         },
       };
-      if (receiver) {
+       if (receiver) {
         io.to(receiver.socketId).emit("getMessage", payload);
       }
       if (sender) {
@@ -354,24 +353,8 @@ app.get("/api/users", async (req, res) => {
 });
 
 app.get("/user/post", async (req, res) => {
-  try {
-    const page = parseInt(req.query.page);
-    const requestedLimit = parseInt(req.query.limit, 10);
-    const limit =
-      Number.isFinite(requestedLimit) && requestedLimit > 0
-        ? Math.min(requestedLimit, 10)
-        : 10;
-
-    const post = await postdb
-      .find()
-      .sort({ _id: -1 })
-      .skip((page - 1) * limit)
-      .limit(limit);
-    return res.json(post);
-  } catch (error) {
-    console.error("Error fetching posts:", error);
-    return res.status(500).json({ error: "Failed to fetch posts" });
-  }
+  const post = await postdb.find().sort({ _id: -1 });
+  return res.json(post);
 });
 
 app.post(
