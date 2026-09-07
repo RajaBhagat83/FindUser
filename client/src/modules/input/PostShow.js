@@ -15,8 +15,8 @@ export default function PostShow({
   const fileInputRef = useRef(null);
   const [image, setImage] = useState(null);
   const [posting, setPosting] = useState(false);
-  const [page, setPage] = useState(1);
   const [isFetching, setIsFetching] = useState(false);
+  const [cursor, setCursor] = useState(null);
 
   async function sendPost() {
     if (!post.trim()) return;
@@ -44,14 +44,18 @@ export default function PostShow({
       setImage(null);
       if (setParentPosting) setParentPosting(true); // show skeleton in PostPage
       setCanPost(false);
-      const response = await fetch(
-        `${BACKEND_URL}/user/post?limit=10&page=${page}`,
-      );
+      let url = `${BACKEND_URL}/user/post?limit=10`;
+      if (cursor) {
+        url += `&cursor=${cursor}`;
+      }
+
+      const response = await fetch(url);
       if (!response.ok) {
         throw new Error(`Failed to refresh posts: ${response.status}`);
       }
       const res = await response.json();
-      setUserpost((prev) => [...prev, ...res]);
+      setUserpost(res.post);
+      setCursor(res.nextcursor._id);
     } catch (err) {
       console.log("error while sending post:", err.message);
     } finally {
@@ -60,40 +64,28 @@ export default function PostShow({
       if (setParentPosting) setParentPosting(false); // hide skeleton in PostPage
     }
   }
-  
+
   useEffect(() => {
     (async () => {
       try {
-        const response = await fetch(`${BACKEND_URL}/user/post?limit=10&page=${page}`);
+        let url = `${BACKEND_URL}/user/post?limit=10`;
+        if (cursor) {
+          url += `&cursor=${cursor}`;
+        }
+        const response = await fetch(url);
         if (!response.ok) {
           throw new Error(`Failed to load posts: ${response.status}`);
         }
         const res = await response.json();
-        setUserpost((prev) =>[...prev,...res]);
+        setUserpost((prev) => [...prev, ...res.post]);
+        setCursor(res.nextcursor._id);
       } catch (error) {
         console.error("Error while fetching posts:", error);
-      }finally{
+      } finally {
         setIsFetching(false);
       }
     })();
-  }, [page]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (isFetching) return;
-      if (
-        window.innerHeight + window.scrollY >=
-        document.body.offsetHeight - 200
-      ) {
-        setIsFetching(true);
-        setPage((p) => p + 1);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [isFetching]);
+  }, []);
 
   return (
     <div

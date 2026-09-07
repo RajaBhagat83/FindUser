@@ -3,7 +3,7 @@ const Post = require("../post/index.js");
 const router =express.Router();
 const multer = require("multer");
 const UserPost = require("../post/UserPost.js");
-
+const { convertVector } = require("../RAG/query.js");
 
 const upload = multer({
   storage : multer.memoryStorage(),
@@ -11,6 +11,7 @@ const upload = multer({
 })
 
 router.post("/upload-post/:userId",upload.single("image"),Post);
-router.get('/getpost/:userId',UserPost)
+router.get('/getpost/:userId',UserPost);
+router.post('/api/chat',convertVector);
 
 module.exports= router;
