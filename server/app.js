@@ -15,6 +15,7 @@ const User = require("./models/User");
 const Conversation = require("./models/Conversation");
 const Messages = require("./models/Messages");
 const postdb = require("./models/Post.js");
+const redisClient = require("./post/redis.js");
 JWT_SECRET = "secret";
 
 require("./db/connection.js");
@@ -28,6 +29,7 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
 });
 
+// console.log("keu is ", process.env.CLOUDINARY_API_KEY);
 const io = socketIo(server, {
   cors: {
     origin: "*",
@@ -46,7 +48,8 @@ app.use(async (req, res, next) => {
   }
 });
 
-app.use(cors({
+app.use(
+  cors({
     origin: "*",
     credentials: true,
   }),
@@ -55,6 +58,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" })); //url-encoded form data ko parse karta hai
 
 app.use("/uploads", express.static("uploads"));
+app.use("/Chat",auth)
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
@@ -96,7 +100,7 @@ io.on("connection", (socket) => {
           interest: user.interest,
         },
       };
-       if (receiver) {
+      if (receiver) {
         io.to(receiver.socketId).emit("getMessage", payload);
       }
       if (sender) {
@@ -200,63 +204,18 @@ app.post("/api/login", async (req, res) => {
 
 // ===== Conversation Endpoints =====
 app.post("/api/conversation", async (req, res) => {
-  const { senderId, receiverId } = req.body;
-  if (!senderId || !receiverId)
-    return res.status(400).send("Required IDs missing");
+  try {
+    const { senderId, receiverId } = req.body;
+    if (!senderId || !receiverId)
+      return res.status(400).send("Required IDs missing");
 
-  let conversation = await Conversation.findOne({
-    members: { $all: [senderId, receiverId] },
-  });
-  if (!conversation) {
-    conversation = new Conversation({ members: [senderId, receiverId] });
-    await conversation.save();
-  }
+    if (
+      !mongoose.Types.ObjectId.isValid(senderId) ||
+      !mongoose.Types.ObjectId.isValid(receiverId)
+    ) {
+      return res.status(400).send("Invalid senderId or receiverId format");
+    }
 
-  res.status(200).json({ conversationId: conversation._id });
-});
-
-app.get("/api/conversation/:userId", async (req, res) => {
-  const { userId } = req.params;
-  if (!mongoose.Types.ObjectId.isValid(userId))
-    return res.status(400).send("Invalid userId");
-
-  const conversations = await Conversation.find({ members: userId });
-  const result = [];
-
-  for (const conv of conversations) {
-    const otherId = conv.members.find((id) => id.toString() !== userId);
-
-    const user = await User.findById(otherId);
-
-    if (!user) continue;
-
-    const isOnline = users.some((u) => u.userId === otherId.toString());
-
-    result.push({
-      user: {
-        receiverId: user._id,
-        fullName: user.fullName,
-        email: user.email,
-        interest: user.interest,
-        isOnline,
-        profilePic: user.profilePic,
-      },
-      conversationId: conv._id,
-    });
-  }
-
-  const filteredResult = result.filter((r) => r !== null);
-
-  res.status(200).json(filteredResult);
-});
-
-//  Messages Endpoints
-app.post("/api/messages", async (req, res) => {
-  let { ConversationId, senderId, message, receiverId } = req.body;
-  if (!senderId || !message)
-    return res.status(400).send("Required fields missing");
-
-  if (ConversationId === "new" && receiverId) {
     let conversation = await Conversation.findOne({
       members: { $all: [senderId, receiverId] },
     });
@@ -264,68 +223,168 @@ app.post("/api/messages", async (req, res) => {
       conversation = new Conversation({ members: [senderId, receiverId] });
       await conversation.save();
     }
-    ConversationId = conversation._id;
+
+    res.status(200).json({ conversationId: conversation._id });
+  } catch (error) {
+    console.error("Error in post /api/conversation:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
+});
 
-  const newMessage = new Messages({
-    ConversationId,
-    senderId,
-    message,
-  });
-  await newMessage.save();
+app.get("/api/conversation/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(userId))
+      return res.status(400).send("Invalid userId");
 
-  res.status(201).json({
-    success: true,
-    message: "Message sent successfully",
-    ConversationId,
-    data: newMessage,
-  });
+    const conversations = await Conversation.find({ members: userId });
+    const result = [];
+
+    for (const conv of conversations) {
+      const otherId = conv.members.find((id) => id.toString() !== userId);
+      if (!otherId) continue;
+
+      const user = await User.findById(otherId);
+      if (!user) continue;
+
+      const isOnline = users.some((u) => u.userId === otherId.toString());
+
+      result.push({
+        user: {
+          receiverId: user._id,
+          fullName: user.fullName,
+          email: user.email,
+          interest: user.interest,
+          isOnline,
+          profilePic: user.profilePic,
+        },
+        conversationId: conv._id,
+      });
+    }
+
+    const filteredResult = result.filter((r) => r !== null);
+    res.status(200).json(filteredResult);
+  } catch (error) {
+    console.error("Error in get /api/conversation/:userId:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+//  Messages Endpoints
+app.post("/api/messages", async (req, res) => {
+  try {
+    let { ConversationId, senderId, message, receiverId } = req.body;
+    if (!senderId || !message)
+      return res.status(400).send("Required fields missing");
+
+    if (!mongoose.Types.ObjectId.isValid(senderId)) {
+      return res.status(400).send("Invalid senderId format");
+    }
+
+    if (ConversationId === "new" && receiverId) {
+      if (!mongoose.Types.ObjectId.isValid(receiverId)) {
+        return res.status(400).send("Invalid receiverId format");
+      }
+      let conversation = await Conversation.findOne({
+        members: { $all: [senderId, receiverId] },
+      });
+      if (!conversation) {
+        conversation = new Conversation({ members: [senderId, receiverId] });
+        await conversation.save();
+      }
+      ConversationId = conversation._id;
+    }
+
+    const newMessage = new Messages({
+      ConversationId,
+      senderId,
+      message,
+    });
+    await newMessage.save();
+
+    res.status(201).json({
+      success: true,
+      message: "Message sent successfully",
+      ConversationId,
+      data: newMessage,
+    });
+  } catch (error) {
+    console.error("Error in post /api/messages:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 app.get("/api/messages/:ConversationId", async (req, res) => {
-  let { ConversationId } = req.params;
+  try {
+    let { ConversationId } = req.params;
 
-  if (ConversationId === "new") {
-    const { senderId, receiverId } = req.query;
-    const conv = await Conversation.findOne({
-      members: { $all: [senderId, receiverId] },
-    });
-    if (!conv) return res.status(200).json([]);
-    ConversationId = conv._id;
+    if (ConversationId === "new") {
+      const { senderId, receiverId } = req.query;
+      if (!senderId || !receiverId) {
+        return res.status(400).send("Required query parameters missing");
+      }
+      if (
+        !mongoose.Types.ObjectId.isValid(senderId) ||
+        !mongoose.Types.ObjectId.isValid(receiverId)
+      ) {
+        return res.status(400).send("Invalid senderId or receiverId format");
+      }
+      const conv = await Conversation.findOne({
+        members: { $all: [senderId, receiverId] },
+      });
+      if (!conv) return res.status(200).json([]);
+      ConversationId = conv._id;
+    } else {
+      if (!mongoose.Types.ObjectId.isValid(ConversationId)) {
+        return res.status(400).send("Invalid ConversationId format");
+      }
+    }
+
+    const messages = await Messages.find({ ConversationId: ConversationId });
+    const result = [];
+
+    for (const msg of messages) {
+      if (!mongoose.Types.ObjectId.isValid(msg.senderId)) continue;
+      const sender = await User.findById(msg.senderId);
+
+      if (!sender) continue;
+
+      result.push({
+        user: {
+          _id: sender._id,
+          email: sender.email,
+          fullName: sender.fullName,
+          interest: sender.interest,
+          profilePic: sender.profilePic,
+        },
+        message: msg.message,
+        createdAt: msg.createdAt,
+      });
+    }
+
+    res.status(200).json(result);
+  } catch (error) {
+    console.error("Error in get /api/messages/:ConversationId:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
-
-  const messages = await Messages.find({ ConversationId: ConversationId });
-  const result = [];
-
-  for (const msg of messages) {
-    const sender = await User.findById(msg.senderId);
-
-    if (!sender) continue;
-
-    result.push({
-      user: {
-        _id: sender._id,
-        email: sender.email,
-        fullName: sender.fullName,
-        interest: sender.interest,
-        profilePic: sender.profilePic,
-      },
-      message: msg.message,
-      createdAt: msg.createdAt,
-    });
-  }
-
-  res.status(200).json(result);
 });
 
 //  Get Users Endpoints
 app.get("/api/users/:userId", async (req, res) => {
-  const { userId } = req.params;
-  const usersData = await User.findOne({ _id: userId });
+  try {
+    const { userId } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ error: "Invalid userId format" });
+    }
+    const usersData = await User.findOne({ _id: userId });
 
-  res.status(200).json({
-    user: usersData,
-  });
+    res.status(200).json({
+      user: usersData,
+    });
+  } catch (error) {
+    console.error("Error in get /api/users/:userId:", error);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 app.get("/api/users", async (req, res) => {
@@ -353,8 +412,48 @@ app.get("/api/users", async (req, res) => {
 });
 
 app.get("/user/post", async (req, res) => {
-  const post = await postdb.find().sort({ _id: -1 });
-  return res.json(post);
+  try {
+    const cursor = req.query.cursor;
+    let query = {};
+    if(cursor){
+      query._id = { $lt: cursor };
+    }
+    const requestedLimit = parseInt(req.query.limit, 10);
+    const cacheData = `posts:${requestedLimit}:${cursor || "first"}`;
+    const founddata = await redisClient.get(cacheData);
+
+    if (founddata) {
+      console.log("Cache found");
+      const post = JSON.parse(founddata);
+      const nextcursor = post.length > 0 ? post[post.length -1] : null;
+      return res.json({
+        source:"redis",
+        post:JSON.parse(founddata),
+        nextcursor
+      });
+    }
+    const limit =
+      Number.isFinite(requestedLimit) && requestedLimit > 0
+        ? Math.min(requestedLimit, 10)
+        : 10;
+
+    const post = await postdb
+      .find(query)
+      .sort({ _id: -1 })
+      .limit(limit);
+
+      await redisClient.set(cacheData,JSON.stringify(post),{Ex : 60});
+
+      const nextcursor = post.length>0 ? post[post.length - 1]:null;
+    return res.json({
+      source:"redis",
+      post:post,
+      nextcursor
+    });
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    return res.status(500).json({ error: "Failed to fetch posts" });
+  }
 });
 
 app.post(
@@ -395,7 +494,6 @@ app.post(
   },
 );
 
-// // ===== Start Server =====
 // const PORT = process.env.PORT || 8000;
 // server.listen(PORT, () => {
 //   console.log(`Server running on port ${PORT}`);

@@ -10,15 +10,25 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter } from "react-router-dom";
 import { RecoilRoot } from "recoil";
 
+
+const theme = localStorage.getItem("theme");
+
+if (theme === "dark") {
+  document.documentElement.classList.add("dark");
+} else {
+  document.documentElement.classList.remove("dark");
+}
+
+
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
+
     <BrowserRouter>
       <RecoilRoot>
         <App />
       </RecoilRoot>
     </BrowserRouter>
-  </React.StrictMode>
+
 );
 
 // If you want to start measuring performance in your app, pass a function

@@ -222,57 +222,64 @@ export default function PostPage() {
   const [canpost, setCanPost] = useState(false);
   const [posting, setPosting] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
+  const [cursor, setCursor] = useState(null);
   const isFetchingRef = useRef(false);
+  const isloader = useRef(false);
+
+  useEffect(() =>{
+   fetchPosts();
+  },[]);
+
+  const fetchPosts = async () => {
+    if (isFetchingRef.current) return;
+
+    isFetchingRef.current = true;
+    setIsFetching(true);
+
+    try {
+      let url = `${BACKEND_URL}/user/post?limit=10`;
+
+      if (cursor) {
+        url += `&cursor=${cursor}`;
+      }
+
+      const response = await fetch(url);
+
+      if (!response.ok) {
+        throw new Error(`Failed to load posts: ${response.status}`);
+      }
+
+      const res = await response.json();
+
+      setUserpost((prev) => [...prev, ...res.post]);
+      console.log("nextCursor",res.nextcursor._id);
+      setCursor(res.nextcursor._id);
+    } catch (error) {
+      console.error("Error while fetching posts:", error);
+    } finally {
+      setIsFetching(false);
+      isFetchingRef.current = false;
+    }
+  };
 
   useEffect(() => {
-    (async () => {
-      try {
-        const response = await fetch(
-          `${BACKEND_URL}/user/post?limit=10&page=${page}`,
-        );
-        if (!response.ok) {
-          throw new Error(`Failed to load posts: ${response.status}`);
+    if (!isloader.current) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && !isFetchingRef.current) {
+          fetchPosts();
         }
-        const res = await response.json();
-        const nextPosts = Array.isArray(res) ? res : [];
-        console.log("post repo", nextPosts);
-        if (nextPosts.length < 10) {
-          setHasMore(false);
-        }
-        setUserpost((prev) => [...prev, ...nextPosts]);
-      } catch (error) {
-        console.error("Error while fetching posts:", error);
-      } finally {
-        setIsFetching(false);
-        isFetchingRef.current = false;
-      }
-    })();
-  }, [page]);
+      },
+      {
+        threshold: 0.1,
+      },
+    );
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (isFetchingRef.current || !hasMore) return;
+    observer.observe(isloader.current);
 
-      const scrollTop =
-        window.scrollY || window.pageYOffset || document.documentElement.scrollTop;
-      const viewportHeight =
-        window.innerHeight || document.documentElement.clientHeight;
-      const fullHeight = document.documentElement.scrollHeight;
-
-      if (scrollTop + viewportHeight >= fullHeight - 250) {
-        isFetchingRef.current = true;
-        setIsFetching(true);
-        setPage((p) => p + 1);
-      }
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [hasMore]);
+    return () => observer.disconnect();
+  }, [cursor]);
 
   return (
     <div className="w-full max-w-2xl mx-auto px-0 sm:px-4 py-2 sm:py-6 flex flex-col gap-2 sm:gap-6">
@@ -327,6 +334,9 @@ export default function PostPage() {
           ))}
         </div>
       )}
+      <div ref={isloader} className="h-10">
+        {isFetching && <p>loading...</p>}
+      </div>
     </div>
   );
 }

@@ -15,26 +15,23 @@ export default function Header({
 }) {
   const [user, setUser] = useRecoilState(us);
   const navigate = useNavigate();
-  const [ViewingOwnProfile, setViewingOwnProfile] = useRecoilState(ViewingOwnProfiles);
-  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const [ViewingOwnProfile, setViewingOwnProfile] =
+    useRecoilState(ViewingOwnProfiles);
+  const [isDark, setIsDark] = useState(
+    () => localStorage.getItem("theme") === "dark",
+  );
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-      document.documentElement.classList.add('dark');
-      setIsDark(true);
-    }
-  }, []);
+ 
 
   const toggleTheme = () => {
-    if (isDark) {
-      document.documentElement.classList.remove('dark');
-      setIsDark(false);
-      localStorage.setItem('theme', 'light');
-    } else {
-      document.documentElement.classList.add('dark');
-      setIsDark(true);
-      localStorage.setItem('theme', 'dark');
+    const newtheme = isDark?"light":"dark";
+    setIsDark(!isDark);
+    localStorage.setItem("theme",newtheme);
+
+    if(newtheme == "dark"){
+      document.documentElement.classList.add("dark");
+    }else{
+      document.documentElement.classList.remove("dark");
     }
   };
 
@@ -50,10 +47,13 @@ export default function Header({
             <FiMenu size={22} />
           </button>
         )}
-        <div className="relative group cursor-pointer" onClick={() => {
-              navigate(`/Profile/${user._id}`);
-              setViewingOwnProfile(true);
-            }}>
+        <div
+          className="relative group cursor-pointer"
+          onClick={() => {
+            navigate(`/Profile/${user._id}`);
+            setViewingOwnProfile(true);
+          }}
+        >
           {user?.profilePic ? (
             <img
               src={user.profilePic}
@@ -67,20 +67,25 @@ export default function Header({
             </div>
           )}
         </div>
-        <span
-          className="hidden md:block text-sm font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[150px]"
-        >
+        <span className="hidden md:block text-sm font-semibold text-slate-800 dark:text-slate-200 truncate max-w-[150px]">
           {user?.fullName || "User"}
         </span>
       </div>
-      
+
       {/* Center - Search (Desktop only) */}
       <div
         onClick={() => navigate("/Search")}
         className="hidden lg:flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-white/5 cursor-pointer hover:bg-slate-200 dark:hover:bg-slate-800 transition-all w-64"
       >
-        <svg className="w-4 h-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>
+        <svg
+          className="w-4 h-4 text-slate-400"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+        >
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
         </svg>
         <span className="text-sm text-slate-400">Search users...</span>
       </div>
@@ -91,14 +96,27 @@ export default function Header({
           onClick={() => navigate("/Search")}
           className="lg:hidden w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
         >
-          <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          <svg
+            className="w-5 h-5"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
         </button>
-        
+
         <button
           onClick={toggleTheme}
           className="w-9 h-9 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
         >
-          {isDark ? <FiSun size={20} className="text-amber-500" /> : <FiMoon size={20} className="text-violet-600" />}
+          {isDark ? (
+            <FiSun size={20} className="text-amber-500" />
+          ) : (
+            <FiMoon size={20} className="text-violet-600" />
+          )}
         </button>
 
         <button
