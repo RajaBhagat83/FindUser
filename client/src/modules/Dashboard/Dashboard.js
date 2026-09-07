@@ -23,6 +23,7 @@ import Searching from "../Elements/Searching.js";
 import PostPage from "../Elements/Post.js";
 import Header from "../Elements/Header.js";
 import { BACKEND_URL } from "../../Components/config.js";
+import RagChat from "../Rag/RagChat.js";
 
 function Dashboard({ handleLogout }) {
   const [user, setUser] = useRecoilState(us);
@@ -87,6 +88,7 @@ function Dashboard({ handleLogout }) {
           </div>
         </div>
       </div>
+        <RagChat />
     </div>
   );
 }
