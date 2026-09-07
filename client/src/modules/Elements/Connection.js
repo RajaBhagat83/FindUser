@@ -14,7 +14,6 @@ import { UserIcon } from "@heroicons/react/outline";
 import SearchIcon from "../input/SearchIcon.js";
 import goku from "../../assets/goku.jpg";
 import { BACKEND_URL } from "../../Components/config.js";
-import RagChat from "../Rag/RagChat.js";
 
 function Connection({ className, isSidebarOpen, toggleSidebar }) {
   const [user, setUser] = useRecoilState(us);
@@ -142,7 +141,6 @@ function Connection({ className, isSidebarOpen, toggleSidebar }) {
             </div>
           ))}
         </div>
-        <RagChat />
       </div>
     </div>
   );
