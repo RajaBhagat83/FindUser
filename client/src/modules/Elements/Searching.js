@@ -61,10 +61,10 @@ export default function SearchUser() {
       const data = await res.json();
       timer = setTimeout(() => {
         const search = searchUser.trim().toLowerCase();
-        if (!search) return setConversation(data);
+        if (!search) return setConversation(data.filteredResult);
         setConversation(
           data.filter((item) =>
-            item.user?.fullName?.toLowerCase().includes(search),
+            item.filteredResult.user?.fullName?.toLowerCase().includes(search),
           ),
         );
       }, 500);
