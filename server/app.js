@@ -58,7 +58,7 @@ app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: false, limit: "50mb" })); //url-encoded form data ko parse karta hai
 
 app.use("/uploads", express.static("uploads"));
-app.use("/Chat",auth)
+app.use("/Chat", auth);
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
@@ -206,6 +206,7 @@ app.post("/api/login", async (req, res) => {
 app.post("/api/conversation", async (req, res) => {
   try {
     const { senderId, receiverId } = req.body;
+
     if (!senderId || !receiverId)
       return res.status(400).send("Required IDs missing");
 
@@ -234,6 +235,18 @@ app.post("/api/conversation", async (req, res) => {
 app.get("/api/conversation/:userId", async (req, res) => {
   try {
     const { userId } = req.params;
+
+    const cacheData = `connections : ${userId}`;
+    const foundData = await redisClient.get(cacheData);
+
+    if (foundData) {
+      const connection = JSON.parse(foundData);
+      return res.json({
+        source: "redis",
+        filteredResult: connection,
+      });
+    }
+
     if (!mongoose.Types.ObjectId.isValid(userId))
       return res.status(400).send("Invalid userId");
 
@@ -263,7 +276,13 @@ app.get("/api/conversation/:userId", async (req, res) => {
     }
 
     const filteredResult = result.filter((r) => r !== null);
-    res.status(200).json(filteredResult);
+    await redisClient.set(cacheData, JSON.stringify(filteredResult), {
+      Ex: 60,
+    });
+    res.status(200).json({
+      source: "main",
+      filteredResult: filteredResult,
+    });
   } catch (error) {
     console.error("Error in get /api/conversation/:userId:", error);
     res.status(500).json({ error: "Internal server error" });
@@ -300,8 +319,9 @@ app.post("/api/messages", async (req, res) => {
       senderId,
       message,
     });
+  
     await newMessage.save();
-
+    await redisClient.del(`connections : ${senderId}`);
     res.status(201).json({
       success: true,
       message: "Message sent successfully",
@@ -415,7 +435,7 @@ app.get("/user/post", async (req, res) => {
   try {
     const cursor = req.query.cursor;
     let query = {};
-    if(cursor){
+    if (cursor) {
       query._id = { $lt: cursor };
     }
     const requestedLimit = parseInt(req.query.limit, 10);
@@ -425,11 +445,11 @@ app.get("/user/post", async (req, res) => {
     if (founddata) {
       console.log("Cache found");
       const post = JSON.parse(founddata);
-      const nextcursor = post.length > 0 ? post[post.length -1] : null;
+      const nextcursor = post.length > 0 ? post[post.length - 1] : null;
       return res.json({
-        source:"redis",
-        post:JSON.parse(founddata),
-        nextcursor
+        source: "redis",
+        post: JSON.parse(founddata),
+        nextcursor,
       });
     }
     const limit =
@@ -437,18 +457,15 @@ app.get("/user/post", async (req, res) => {
         ? Math.min(requestedLimit, 10)
         : 10;
 
-    const post = await postdb
-      .find(query)
-      .sort({ _id: -1 })
-      .limit(limit);
+    const post = await postdb.find(query).sort({ _id: -1 }).limit(limit);
 
-      await redisClient.set(cacheData,JSON.stringify(post),{Ex : 60});
+    await redisClient.set(cacheData, JSON.stringify(post), { Ex: 60 });
 
-      const nextcursor = post.length>0 ? post[post.length - 1]:null;
+    const nextcursor = post.length > 0 ? post[post.length - 1] : null;
     return res.json({
-      source:"redis",
-      post:post,
-      nextcursor
+      source: "main",
+      post: post,
+      nextcursor,
     });
   } catch (error) {
     console.error("Error fetching posts:", error);
